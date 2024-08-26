@@ -61,7 +61,7 @@ export default function AuthPage() {
           alt="CaliGo"
           width={200}
           height={200}
-          className="logo mb-8"
+          className="logo"
         />
 
         <section className="max-w-lg mb-12 m-4">
