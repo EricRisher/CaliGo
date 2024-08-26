@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Black.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lora";
+  src: url("/fonts/Lora-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "Lora", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+/* Global Heading Styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", sans-serif;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  color: #222;
+}
+
+/* Individual Heading Styles */
+h1 {
+  font-size: 3rem; /* ~40px */
+  color: #000;
+}
+
+h2 {
+  font-size: 2rem; /* ~32px */
+  color: #111;
+}
+
+h3 {
+  font-size: 1.75rem; /* ~28px */
+  color: #222;
+}
+
+h4 {
+  font-size: 1.5rem; /* ~24px */
+  color: #333;
+}
+
+h5 {
+  font-size: 1.25rem; /* ~20px */
+  color: #444;
+}
+
+h6 {
+  font-size: 1rem; /* ~16px */
+  color: #555;
+}
+
+p,
+a {
+  font-size: 1.1rem;
+  font-family: "Lora", sans-serif;
+  margin: 1rem 1rem 1.5rem 1rem;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem; /* ~32px */
+  }
+  h2 {
+    font-size: 1.6rem; /* ~28px */
+  }
+  h3 {
+    font-size: 1.5rem; /* ~24px */
+  }
+  h4 {
+    font-size: 1.25rem; /* ~20px */
+  }
+  h5 {
+    font-size: 1.1rem; /* ~18px */
+  }
+  h6 {
+    font-size: 0.95rem; /* ~15px */
+  }
+
+  p,
+  a {
+    font-size: 1rem;
+    margin: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+}
+
+.btn-primary {
+  display: block;
+  color: #000000;
+  background-color: #ffffff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  align-content: center;
+  margin: auto;
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 1.5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.locate-btn {
+  bottom: 6rem;
+}
+
+button {
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 1.5px;
+}
+
+/* Hover and Focus Effects */
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #5a88ff;
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  outline: none; /* Remove default focus outline */
+}
+
+.btn-primary:focus {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(195, 212, 255, 0.7);
+}
+
+.logo {
+  padding-top: 4rem;
+  padding-bottom: 2rem;
+}
+
+.header,
+.navbar {
+  z-index: 1000;
+}
+
+.leaflet-control-container .leaflet-top.leaflet-left {
+  top: 100px;
+}
+
+.progress-bar {
+  transition: width 0.5s ease-in-out;
+}
