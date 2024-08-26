@@ -14,13 +14,11 @@
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "leaflet": "^1.9.4",
-    "mysql2": "^3.11.0",
     "next": "14.2.6",
     "next-pwa": "^5.6.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-leaflet": "^4.2.1",
-    "sequelize": "^6.37.3"
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",

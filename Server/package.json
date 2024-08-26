@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-session-sequelize": "^7.1.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ipv4": "^1.0.4",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3"
+  }
+}
