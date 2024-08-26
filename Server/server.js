@@ -4,18 +4,24 @@ const sequelize = require("./config/database");
 const userRoutes = require("./routes/user");
 const spotRoutes = require("./routes/spots");
 const commentRoutes = require("./routes/comments");
+const authRoutes = require("./routes/auth");
+const helmet = require("helmet");
+const cors = require("cors");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.use(helmet()); // Use helmet for security
 app.use(express.json());
+app.use(cors()); // Allow cross-origin requests
 
-// Use the combined routes and controllers
+// Use routes
 app.use("/api", userRoutes);
 app.use("/api", spotRoutes);
 app.use("/api", commentRoutes);
+app.use("/", authRoutes);
 
 sequelize
   .authenticate()

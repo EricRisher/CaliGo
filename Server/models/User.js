@@ -1,13 +1,10 @@
-const { DataTypes } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const bcrypt = require("bcryptjs");
 
 const User = sequelize.define(
   "User",
   {
-    id: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -15,40 +12,36 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
+      validate: {
+        isEmail: true,
+      },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      length: [5, 100],
     },
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    xp: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
   },
   {
+    timestamps: true,
     hooks: {
-      async beforeCreate(user) {
-        if (user.profilePicture === null) {
-          user.profilePicture =
-            "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+      beforeCreate: async (user) => {
+        // Hash the user's password
+        if (user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
         }
-      },
-      async beforeCreate(newUserData) {
-        newUserData.password = await bcrypt.hash(newUserData.password, 10);
-        return newUserData;
-      },
-      async beforeUpdate(updatedUserData) {
-        updatedUserData.password = await bcrypt.hash(
-          updatedUserData.password,
-          10
-        );
-        return updatedUserData;
+
+        // Set a default profile picture if none is provided
+        if (!user.profilePicture) {
+          user.profilePicture = `https://www.gravatar.com/avatar/${user.email}?d=identicon`;
+        }
       },
     },
   }
