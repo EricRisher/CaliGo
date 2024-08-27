@@ -20,6 +20,10 @@
     "passport-google-oauth20": "^2.0.0",
     "sequelize": "^6.37.3"
   },
+    "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "name": "caligo",
   "version": "1.0.0",
   "main": "server.js",
