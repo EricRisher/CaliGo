@@ -66,7 +66,7 @@ function LocateButton({
   );
 }
 
-export default function CustomMap() {
+export default function CustomMap( {}) {
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null);
 
   return (

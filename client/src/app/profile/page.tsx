@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Button from "../../components/button";
 import { useSearchParams } from "next/navigation";
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProfileContent />
+    </Suspense>
+  );
+}
+
+function ProfileContent() {
   const [xp, setXp] = useState(0); // Starting XP for the user
   const [level, setLevel] = useState(1); // Starting level for the user
 
@@ -94,6 +102,7 @@ export default function ProfilePage() {
       setXp(newXp); // Just add XP without leveling up
     }
   };
+
   return (
     <div className="relative flex flex-col min-h-screen bg-primary">
       <div className="relative w-full p-4 flex justify-between items-center z-10">
@@ -103,7 +112,11 @@ export default function ProfilePage() {
             alt="Close"
             width={32}
             height={32}
-            onClick={() => (window.location.href = "/home")}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.location.href = "/home";
+              }
+            }}
           />
         </button>
         <button>
