@@ -8,6 +8,18 @@
     "server": "npm start --prefix server"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "leaflet": "^1.9.4",
+    "next": "14.2.6",
+    "next-pwa": "^5.6.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-leaflet": "^4.2.1",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "connect-session-sequelize": "^7.1.7",
@@ -22,16 +34,6 @@
     "mysql2": "^3.11.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "sequelize": "^6.37.3",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^5.16.7",
-    "@mui/material": "^5.16.7",
-    "leaflet": "^1.9.4",
-    "next": "14.2.6",
-    "next-pwa": "^5.6.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-leaflet": "^4.2.1"
+    "sequelize": "^6.37.3"
   }
 }
