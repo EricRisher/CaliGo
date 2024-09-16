@@ -1,44 +1,46 @@
+const path = require("path");
 const express = require("express");
-const dotenv = require("dotenv");
-const sequelize = require("./config/database");
-const userRoutes = require("./routes/user");
-const spotRoutes = require("./routes/spots");
-const commentRoutes = require("./routes/comments");
-const authRoutes = require("./routes/auth");
+const session = require("express-session");
+const routes = require("./routes");
 const helmet = require("helmet");
 const cors = require("cors");
+require("./models/Index.js"); // Ensure the correct relative path
 
-dotenv.config();
+const sequelize = require("./config/connection");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Session configuration
+const sess = {
+  secret: "KittyMeowKat",
+  cookie: {
+    maxAge: 3600000, // 1 hour session duration
+    httpOnly: false,
+    secure: false,
+  },
+  resave: false,
+  saveUninitialized: true,
+  store: new SequelizeStore({
+    db: sequelize,
+  }),
+};
+
+// Middleware
+app.use(session(sess)); // Initialize session middleware
 app.use(helmet()); // Use helmet for security
 app.use(express.json());
 app.use(cors()); // Allow cross-origin requests
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
 
-// Use routes
-app.use("/api", userRoutes);
-app.use("/api", spotRoutes);
-app.use("/api", commentRoutes);
-app.use("/", authRoutes);
+// Routes
+app.use(routes);
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log(
-      "Connection to the database has been established successfully."
-    );
-    return sequelize.sync();
-  })
-  .then(() => {
-    console.log("Database & tables created!");
-  })
-  .catch((error) => {
-    console.error("Unable to connect to the database:", error);
-  });
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Start server and sync database
+sequelize.sync({ force: false }).then(() => {
+  app.listen(PORT, () =>
+    console.log(`Now listening on http://localhost:${PORT}`)
+  );
 });

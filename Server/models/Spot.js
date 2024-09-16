@@ -1,39 +1,47 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("../config/connection");
 const User = require("./User");
 
-const Spot = sequelize.define("Spot", {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  location: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  imageUrl: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  userId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    references: {
-      model: User,
-      key: "id",
+class Spot extends Model {}
+
+Spot.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    spotName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
   },
-});
-
-User.hasMany(Spot, { foreignKey: "userId" });
-Spot.belongsTo(User, { foreignKey: "userId" });
+  {
+    sequelize,
+    timestamps: true,
+    freezeTableName: true,
+    modelName: "Spot",
+  }
+);
 
 module.exports = Spot;

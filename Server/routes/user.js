@@ -5,7 +5,7 @@ const Spot = require("../models/Spot");
 const router = express.Router();
 
 // Create a new user
-router.post("/users", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const user = await User.create(req.body);
     res.status(201).json(user);
@@ -15,7 +15,7 @@ router.post("/users", async (req, res) => {
 });
 
 // Update a user
-router.put("/users/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const [updated] = await User.update(req.body, {
@@ -34,7 +34,7 @@ router.put("/users/:id", async (req, res) => {
 });
 
 // Delete a user
-router.delete("/users/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await User.destroy({
@@ -52,7 +52,7 @@ router.delete("/users/:id", async (req, res) => {
 });
 
 // Get all users
-router.get("/users", async (req, res) => {
+router.get("", async (req, res) => {
   try {
     const users = await User.findAll();
     res.status(200).json(users);
@@ -62,7 +62,7 @@ router.get("/users", async (req, res) => {
 });
 
 // Get a user by id
-router.get("/users/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
@@ -78,7 +78,7 @@ router.get("/users/:id", async (req, res) => {
 });
 
 // Get all spots created by a user
-router.get("/users/:userId/spots", async (req, res) => {
+router.get("/:userId/spots", async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findByPk(userId, {
@@ -96,7 +96,7 @@ router.get("/users/:userId/spots", async (req, res) => {
 });
 
 // Get all spots saved by a user
-router.get("/users/:userId/saved-spots", async (req, res) => {
+router.get("/:userId/saved-spots", async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findByPk(userId, {

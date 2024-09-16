@@ -1,5 +1,5 @@
-require("dotenv").config();
-const Sequelize = require("sequelize");
+require('dotenv').config();
+const Sequelize = require('sequelize');
 
 let sequelize;
 
@@ -11,10 +11,10 @@ if (process.env.DB_URL) {
     process.env.DB_USER,
     process.env.DB_PW,
     {
-      host: "localhost",
-      dialect: "mysql",
+      host: 'localhost',
+      dialect: 'mysql',
       port: 3306,
-    }
+    },
   );
 }
 

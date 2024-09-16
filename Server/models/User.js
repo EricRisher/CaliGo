@@ -1,10 +1,22 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("../config/connection");
 const bcrypt = require("bcryptjs");
 
-const User = sequelize.define(
-  "User",
+class User extends Model {
+  checkPassword(loginPw) {
+    // Use bcrypt to compare the login password with the stored hashed password
+    return bcrypt.compare(loginPw, this.password);
+  }
+}
+
+User.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -12,7 +24,7 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       unique: true,
       validate: {
         isEmail: true,
@@ -21,27 +33,32 @@ const User = sequelize.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      length: [5, 100],
-    },
-    profilePicture: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      validate: {
+        len: [8], // Password length validation
+      },
     },
   },
   {
-    timestamps: true,
+    sequelize,
+    timestamps: false,
+    freezeTableName: true,
+    modelName: "User",
+    tableName: "users",
     hooks: {
-      beforeCreate: async (user) => {
-        // Hash the user's password
-        if (user.password) {
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
+      // Hook to hash password before creating the user
+      beforeCreate: async (newUserData) => {
+        newUserData.password = await bcrypt.hash(newUserData.password, 10);
+        return newUserData;
+      },
+      // Hook to hash password before updating the user
+      beforeUpdate: async (updatedUserData) => {
+        if (updatedUserData.password) {
+          updatedUserData.password = await bcrypt.hash(
+            updatedUserData.password,
+            10
+          );
         }
-
-        // Set a default profile picture if none is provided
-        if (!user.profilePicture) {
-          user.profilePicture = `https://www.gravatar.com/avatar/${user.email}?d=identicon`;
-        }
+        return updatedUserData;
       },
     },
   }

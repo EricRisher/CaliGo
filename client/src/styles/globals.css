@@ -141,6 +141,23 @@ a {
   transition: all 0.3s ease;
 }
 
+.btn-secondary {
+  display: block;
+  color: #ffffff;
+  background-color: #5a88ff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  align-content: center;
+  margin: auto;
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 1.5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
 .locate-btn {
   bottom: 6rem;
 }
@@ -180,4 +197,20 @@ button {
 
 .progress-bar {
   transition: width 0.5s ease-in-out;
+}
+
+.post-container {
+  max-width: 500px;
+  max-height: 500px;
+  width: 100%; /* Ensures the container is responsive */
+  height: 500px; /* Explicit height to prevent 0 height issue */
+  position: relative;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.post-image {
+  object-fit: cover; /* Ensures the image covers the container */
+  width: 100%; /* Fill the width of the container */
+  height: 100%; /* Fill the height of the container */
 }

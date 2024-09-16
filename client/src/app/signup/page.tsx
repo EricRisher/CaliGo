@@ -5,53 +5,75 @@ import Image from "next/image";
 import Button from "../../components/button";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(true); // Toggle between login and signup
+  const [error, setError] = useState<string | null>(null); // Track error messages
+  const [email, setEmail] = useState<string>(""); // Track email input value for signup
 
-  const handleAuth = async () => {
-    const usernameElement = document.querySelector(
-      "#username"
-    ) as HTMLInputElement | null;
-    const passwordElement = document.querySelector(
-      "#password"
-    ) as HTMLInputElement | null;
+  // Handle Login/Signup logic
+const handleAuth = async () => {
+  const usernameElement = document.querySelector(
+    "#username"
+  ) as HTMLInputElement | null;
+  const passwordElement = document.querySelector(
+    "#password"
+  ) as HTMLInputElement | null;
+  const emailElement = document.querySelector(
+    "#email"
+  ) as HTMLInputElement | null;
 
-    if (!usernameElement || !passwordElement) {
-      console.error("Username or Password input is missing");
-      return;
+  if (!usernameElement || !passwordElement) {
+    setError("Username or Password input is missing");
+    return;
+  }
+
+  const username = usernameElement.value.trim();
+  const password = passwordElement.value.trim();
+  const email = emailElement?.value.trim(); // Get the email if it exists
+
+  if (!username || !password || (!isLogin && !email)) {
+    setError("All fields are required for signup");
+    return;
+  }
+
+  const bodyData = isLogin
+    ? { username, password }
+    : { username, password, email }; // Send email during signup
+
+  console.log("Request Body:", bodyData); // Log the body data
+
+  const endpoint = isLogin
+    ? "http://localhost:3001/auth/login"
+    : "http://localhost:3001/auth/signup";
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyData),
+    });
+
+    const contentType = response.headers.get("content-type");
+
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new TypeError("Expected JSON but got something else");
     }
 
-    const username = usernameElement.value;
-    const password = passwordElement.value;
-    const endpoint = "/signup";
+    const data = await response.json();
 
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const contentType = response.headers.get("content-type");
-
-      // Check if the response is JSON
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new TypeError("Expected JSON but got something else");
-      }
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("Success:", data);
-        window.location.href = "/home";
-      } else {
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error("Error during authentication:", error);
+    if (response.ok) {
+      console.log("Success:", data);
+      window.location.href = "/home";
+    } else {
+      setError(data.error || "Authentication failed");
     }
-  };
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    setError("Error during authentication");
+  }
+};
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -65,18 +87,28 @@ export default function AuthPage() {
         />
 
         <section className="max-w-lg mb-12 m-4">
+          {/* Google Login Button */}
           <Button className="bg-gray-200 text-black py-3">
             Log In with Google
           </Button>
 
           <p className="text-lg font-light">or</p>
+
+          {/* Toggle between Login and Signup */}
           <Button
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setError(null); // Clear errors when toggling
+            }}
             className="w-full text-black py-4 rounded-md"
           >
-            {isLogin ? "Have an account?" : "First time here?"}
+            {isLogin ? "First time here?" : "Have an account?"}
           </Button>
 
+          {/* Display error if exists */}
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+
+          {/* Username Input */}
           <input
             id="username"
             type="text"
@@ -84,6 +116,19 @@ export default function AuthPage() {
             className="w-full px-4 py-2 mt-4 bg-gray-200 text-black rounded-md mb-4"
           />
 
+          {/* Email Input - Only show if signing up */}
+          {!isLogin && (
+            <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              className="w-full px-4 py-2 bg-gray-200 text-black rounded-md mb-4"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          )}
+
+          {/* Password Input */}
           <input
             id="password"
             type="password"
@@ -92,6 +137,7 @@ export default function AuthPage() {
           />
 
           <div className="space-y-4">
+            {/* Login or Signup Button */}
             <Button
               onClick={handleAuth}
               className="w-full text-black py-3 rounded-md"
@@ -99,12 +145,17 @@ export default function AuthPage() {
               {isLogin ? "Login" : "Sign Up"}
             </Button>
 
-            <a
-              href="/forgot-password"
-              className="text-sm text-gray-500 hover:underline mt-2"
-            >
-              forgot password
-            </a>
+            {/* Forgot Password Link */}
+            {isLogin && (
+              <a
+                href="/reset-password"
+                className="text-sm text-gray-500 hover:underline mt-2"
+              >
+                Forgot password?
+              </a>
+            )}
+
+            {/* Continue as Guest */}
             <Button
               onClick={() => (window.location.href = "/home")}
               className=" text-black py-3 rounded-md"

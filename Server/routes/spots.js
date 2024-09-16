@@ -6,7 +6,7 @@ const Comment = require("../models/Comment");
 const router = express.Router();
 
 // Create a new spot
-router.post("/spots", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const spot = await Spot.create(req.body);
     res.status(201).json(spot);
@@ -16,17 +16,23 @@ router.post("/spots", async (req, res) => {
 });
 
 // Get all spots
-router.get("/spots", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const spots = await Spot.findAll({ include: User });
+    const spots = await Spot.findAll({
+      include: {
+        model: User,
+        attributes: { exclude: ["password"] }, // Exclude password field from the response
+      },
+    });
     res.status(200).json(spots);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching spots." });
   }
 });
 
 // Get a spot by ID
-router.get("/spots/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const spot = await Spot.findByPk(req.params.id, {
       include: [User, Comment],
@@ -41,7 +47,7 @@ router.get("/spots/:id", async (req, res) => {
 });
 
 // Update a spot by ID
-router.put("/spots/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const spot = await Spot.findByPk(req.params.id);
     if (!spot) {
@@ -55,7 +61,7 @@ router.put("/spots/:id", async (req, res) => {
 });
 
 // Delete a spot by ID
-router.delete("/spots/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const spot = await Spot.findByPk(req.params.id);
     if (!spot) {
