@@ -7,6 +7,7 @@ const spotData = [
     location: "Huntington Beach, CA",
     image: "https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg",
     userId: 1,
+    createdDate: "2024-09-01",
   },
   {
     spotName: "Malibu",
@@ -14,6 +15,7 @@ const spotData = [
     location: "Malibu, CA",
     image: "https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg",
     userId: 2,
+    createdDate: "2024-09-02",
   },
   {
     spotName: "Venice Beach",
@@ -21,6 +23,7 @@ const spotData = [
     location: "Venice Beach, CA",
     image: "https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg",
     userId: 3,
+    createdDate: "2024-09-03",
   },
   {
     spotName: "Santa Monica Beach",
@@ -28,6 +31,7 @@ const spotData = [
     location: "Santa Monica, CA",
     image: "https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg",
     userId: 4,
+    createdDate: "2024-09-04",
   },
   {
     spotName: "Newport Beach",
@@ -35,6 +39,7 @@ const spotData = [
     location: "Newport Beach, CA",
     image: "https://mtek3d.com/wp-content/uploads/2018/01/image-placeholder-500x500.jpg",
     userId: 5,
+    createdDate: "2024-09-05",
   },
 ];
 

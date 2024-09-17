@@ -6,7 +6,7 @@ import { Navigation } from "../../components/navbar";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-[#f0f0f0]">
       <Header />
       <main className="flex-grow p-4 py-[100px]">
         <Spots />

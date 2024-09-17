@@ -4,7 +4,10 @@ import { CommentPreview } from "../components/commentPreview";
 
 // Define interfaces for Spot, Comment, and User
 interface Comment {
-  content: string;
+  commentText: string;
+  User: {
+    username: string;
+  };
 }
 
 interface User {
@@ -15,9 +18,20 @@ interface Spot {
   id: number;
   spotName: string;
   location: string;
+  description: string;
   image: string;
   User: User;
-  comments: Comment[];
+  comments?: Comment[];
+  date: string;
+  updatedAt: string;
+}
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
 }
 
 export function Spots() {
@@ -27,6 +41,9 @@ export function Spots() {
   const [bookmarkedPosts, setBookmarkedPosts] = useState<{
     [id: number]: boolean;
   }>({});
+  const [commentsData, setCommentsData] = useState<{ [id: number]: Comment[] }>(
+    {}
+  ); // Store comments for each spot
 
   // Fetch all spots
   useEffect(() => {
@@ -44,6 +61,17 @@ export function Spots() {
 
     fetchSpots();
   }, []);
+
+  // Fetch comments for a specific spot
+  const fetchComments = async (spotId: number) => {
+    try {
+      const response = await fetch(`http://localhost:3001/comments/${spotId}`);
+      const comments = await response.json();
+      setCommentsData((prev) => ({ ...prev, [spotId]: comments }));
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
 
   // Function to toggle like state for individual posts
   const toggleLike = (id: number) => {
@@ -68,13 +96,12 @@ export function Spots() {
       {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
-          className="bg-gray-300 rounded-md shadow-md p-4 mb-4 max-w-sm mx-auto"
+          className="bg-gray-200 rounded-md shadow-md p-4 mb-4 max-w-sm mx-auto"
         >
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center">
             <div>
               <p className="font-bold mb-0">{spot.spotName}</p>
               <p className="mt-0">{spot.location}</p>
-              <p className="text-sm">- {spot.User?.username}</p>
             </div>
             <button>
               <Image
@@ -96,7 +123,7 @@ export function Spots() {
               />
             )}
           </div>
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center">
             <div className="flex space-x-4">
               <button onClick={() => toggleLike(spot.id)}>
                 <Image
@@ -132,13 +159,32 @@ export function Spots() {
               />
             </button>
           </div>
+          <div>
+            <p className="m-0 pt-2">
+              <b>{spot.User?.username}</b> {spot.description}
+            </p>
+          </div>
+          {/* Fetch and display comments when clicking "View All Comments" */}
           <CommentPreview
-            commentCount={spot.comments?.length || 0}
-            previewText={spot.comments?.[0]?.content || "No comments yet"}
             comments={
-              spot.comments?.map((comment: Comment) => comment.content) || []
+              commentsData[spot.id]?.map((comment) => ({
+                commentText: comment.commentText,
+                username: comment.User?.username, // Ensure you access the User object
+              })) || []
             }
+            onFetchComments={async () => {
+              const response = await fetch(
+                `http://localhost:3001/comments/${spot.id}`
+              );
+              const fetchedComments = await response.json();
+              return fetchedComments.map((comment) => ({
+                commentText: comment.commentText,
+                username: comment.User.username,
+              }));
+            }}
+            spotId={spot.id} // Pass the spotId here
           />
+          <div className="mt-1 font-normal">{formatDate(spot.updatedAt)}</div>
         </div>
       ))}
     </div>

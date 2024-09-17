@@ -6,30 +6,46 @@ const User = require("../models/User");
 const router = express.Router();
 
 // Create a new comment on a spot
-router.post("/spots/:spotId/comments", async (req, res) => {
+router.post("/:spotId", async (req, res) => {
   try {
-    const spot = await Spot.findByPk(req.params.spotId);
-    if (!spot) {
-      return res.status(404).json({ error: "Spot not found" });
-    }
-    const comment = await Comment.create({
-      ...req.body,
+    const { commentText, userId } = req.body;
+    const newComment = await Comment.create({
+      commentText,
+      userId,
       spotId: req.params.spotId,
-      userId: req.body.userId, // Assume userId is passed in the request body
     });
-    res.status(201).json(comment);
+
+    // Include the user information in the response
+    const commentWithUser = await Comment.findByPk(newComment.id, {
+      include: User, // Assuming you have a User model associated with Comment
+    });
+
+    res.status(201).json(commentWithUser);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
+
 // Get all comments for a spot
-router.get("/spots/:spotId/comments", async (req, res) => {
+router.get("/:spotId", async (req, res) => {
   try {
     const comments = await Comment.findAll({
       where: { spotId: req.params.spotId },
-      include: User,
+      include: [
+        {
+          model: User,
+          attributes: ["username"], // Fetch only username
+        },
+      ],
     });
+
+    if (comments.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No comments found for this spot" });
+    }
+
     res.status(200).json(comments);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,7 +53,7 @@ router.get("/spots/:spotId/comments", async (req, res) => {
 });
 
 // Update a comment by ID
-router.put("/comments/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {
@@ -51,7 +67,7 @@ router.put("/comments/:id", async (req, res) => {
 });
 
 // Delete a comment by ID
-router.delete("/comments/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {

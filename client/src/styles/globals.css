@@ -214,3 +214,11 @@ button {
   width: 100%; /* Fill the width of the container */
   height: 100%; /* Fill the height of the container */
 }
+
+.transition-slide-up {
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(100%);
+}
+.transition-slide-up-active {
+  transform: translateY(0);
+}
