@@ -188,7 +188,7 @@ button {
 
 .header,
 .navbar {
-  z-index: 1000;
+  z-index: 100;
 }
 
 .leaflet-control-container .leaflet-top.leaflet-left {
@@ -221,4 +221,17 @@ button {
 }
 .transition-slide-up-active {
   transform: translateY(0);
+}
+
+/* CSS for smooth sliding up effect */
+.fixed-form {
+  transition: transform 0.3s ease-in-out;
+}
+
+.hidden-form {
+  transform: translateY(100%);
+}
+
+.visible-form {
+  transform: translateY(-10vh);
 }

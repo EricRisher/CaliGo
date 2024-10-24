@@ -1,42 +1,57 @@
+require("dotenv").config();
+const { clerkMiddleware } = require("@clerk/express");
 const path = require("path");
 const express = require("express");
-const session = require("express-session");
-const routes = require("./routes");
 const helmet = require("helmet");
 const cors = require("cors");
-require("./models/Index.js"); // Ensure the correct relative path
+const cookieParser = require("cookie-parser"); // Add this for handling cookies
+const routes = require("./routes");
 
 const sequelize = require("./config/connection");
-const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Session configuration
-const sess = {
-  secret: "KittyMeowKat",
-  cookie: {
-    maxAge: 3600000, // 1 hour session duration
-    httpOnly: false,
-    secure: false,
-  },
-  resave: false,
-  saveUninitialized: true,
-  store: new SequelizeStore({
-    db: sequelize,
-  }),
-};
-
 // Middleware
-app.use(session(sess)); // Initialize session middleware
 app.use(helmet()); // Use helmet for security
+app.use(clerkMiddleware());
+
+// Helmet Content Security Policy (optional, but enhances security)
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      "script-src": ["'self'", "trusted-cdn.com"],
+      "style-src": ["'self'", "'unsafe-inline'"],
+    },
+  })
+);
+
+// CORS configuration (Limit origins for better security)
+const allowedOrigins = ["http://localhost:3001", "http://localhost:3000"];
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
-app.use(cors()); // Allow cross-origin requests
-app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Parses cookies
+
+// Serve static assets
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 
 // Routes
 app.use(routes);
+
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
 
 // Start server and sync database
 sequelize.sync({ force: false }).then(() => {

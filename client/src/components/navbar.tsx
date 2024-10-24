@@ -1,13 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Correct import for App Router
+import { useRouter, usePathname } from "next/navigation"; // Correct import for App Router
 
 export function Navigation() {
   const router = useRouter();
 
   const goToSaved = () => {
     router.push("/profile?saved=true");
+  };
+
+  const pathname = usePathname();
+
+  const goToAddSpot = () => {
+    if (pathname === "/map") {
+      // Dispatch the custom event if we're already on the map page
+      const addSpotEvent = new CustomEvent("openAddSpotForm");
+      window.dispatchEvent(addSpotEvent);
+    } else {
+      // Navigate to /map, then trigger the form opening
+      router.push("/map");
+      setTimeout(() => {
+        const addSpotEvent = new CustomEvent("openAddSpotForm");
+        window.dispatchEvent(addSpotEvent);
+      }, 500); // Delay to ensure route change completes before triggering event
+    }
   };
 
   return (
@@ -26,10 +43,7 @@ export function Navigation() {
         <Image src="/icons/location.png" alt="Map" width={32} height={32} />
         <span className="text-sm pt-2">Map</span>
       </button>
-      <button
-        onClick={() => router.push("/add")}
-        className="flex flex-col items-center"
-      >
+      <button onClick={goToAddSpot} className="flex flex-col items-center">
         <Image src="/icons/plus.png" alt="Add" width={32} height={32} />
         <span className="text-sm pt-2">Add</span>
       </button>

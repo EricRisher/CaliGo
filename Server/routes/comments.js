@@ -2,13 +2,16 @@ const express = require("express");
 const Comment = require("../models/Comment");
 const Spot = require("../models/Spot");
 const User = require("../models/User");
+const { requireAuth } = require("@clerk/express"); // Clerk's auth middleware
 
 const router = express.Router();
 
-// Create a new comment on a spot
-router.post("/:spotId", async (req, res) => {
+// Create a comment (Protected Route)
+router.post("/:spotId", requireAuth(), async (req, res) => {
   try {
-    const { commentText, userId } = req.body;
+    const { commentText } = req.body;
+    const userId = req.auth.userId; // Get the authenticated user's ID from Clerk
+
     const newComment = await Comment.create({
       commentText,
       userId,
@@ -17,15 +20,18 @@ router.post("/:spotId", async (req, res) => {
 
     // Include the user information in the response
     const commentWithUser = await Comment.findByPk(newComment.id, {
-      include: User, // Assuming you have a User model associated with Comment
+      include: {
+        model: User,
+        attributes: ["id", "username"], // Include only necessary attributes
+      },
     });
 
     res.status(201).json(commentWithUser);
   } catch (error) {
+    console.error("Error creating comment:", error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 // Get all comments for a spot
 router.get("/:spotId", async (req, res) => {
@@ -52,13 +58,21 @@ router.get("/:spotId", async (req, res) => {
   }
 });
 
-// Update a comment by ID
-router.put("/:id", async (req, res) => {
+// Update a comment by ID (Protected Route)
+router.put("/:id", requireAuth(), async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {
       return res.status(404).json({ error: "Comment not found" });
     }
+
+    // Ensure the authenticated user is the comment owner
+    if (comment.userId !== req.auth.userId) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to update this comment" });
+    }
+
     await comment.update(req.body);
     res.status(200).json(comment);
   } catch (error) {
@@ -66,13 +80,21 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Delete a comment by ID
-router.delete("/:id", async (req, res) => {
+// Delete a comment by ID (Protected Route)
+router.delete("/:id", requireAuth(), async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {
       return res.status(404).json({ error: "Comment not found" });
     }
+
+    // Ensure the authenticated user is the comment owner
+    if (comment.userId !== req.auth.userId) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to delete this comment" });
+    }
+
     await comment.destroy();
     res.status(204).send();
   } catch (error) {

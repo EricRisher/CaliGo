@@ -19,6 +19,7 @@ Comment.init(
     },
     userId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: User,
         key: "id",
@@ -26,6 +27,7 @@ Comment.init(
     },
     spotId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: Spot,
         key: "id",
@@ -34,7 +36,7 @@ Comment.init(
   },
   {
     sequelize,
-    timestamps: false,
+    timestamps: true, // Changed to true
     freezeTableName: true,
     modelName: "Comment",
   }

@@ -48,10 +48,8 @@ export function CommentPreview({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          commentText: newComment,
-          userId: 1, // Change this to the correct logged-in user's ID
-        }),
+        credentials: "include", // Include cookies in the request
+        body: JSON.stringify({ commentText: newComment }), // Corrected line
       });
 
       if (!response.ok) {
@@ -116,7 +114,7 @@ export function CommentPreview({
                 />
                 <button
                   type="submit"
-                  className="bg-blue-500 text-white py-1 px-4 mt-2 rounded-lg hover:bg-blue-600"
+                  className="bg-secondary text-white py-1 px-4 mt-2 rounded-lg hover:bg-blue-600"
                 >
                   Post
                 </button>

@@ -19,7 +19,7 @@ export default function AuthPage() {
         />
 
         <header className="mt-8">
-          <SignUp afterSignUpUrl="/home" routing="hash" />
+          <SignIn afterSignInUrl="/home" routing="hash" />
         </header>
       </main>
     </div>

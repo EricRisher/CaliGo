@@ -53,7 +53,7 @@ function LocateButton({
   return (
     <button
       onClick={handleClick}
-      className="absolute bottom-5 left-4 z-1000 "
+      className="absolute bottom-5 left-4 z-5 "
     >
       <Image
         src="/icons/mylocation.png"
@@ -70,7 +70,7 @@ export default function CustomMap( {}) {
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null);
 
   return (
-    <div className="relative">
+    <div className="relative z-10">
       <MapContainer
         center={[34.0522, -118.2437]}
         zoom={10}

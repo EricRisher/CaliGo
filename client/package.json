@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/preset-react": "^7.24.7",
+    "@clerk/nextjs": "^5.7.5",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "leaflet": "^1.9.4",
-    "next": "14.2.6",
+    "next": "^14.2.16",
     "next-pwa": "^5.6.0",
     "postcss": "^8",
     "react": "^18",

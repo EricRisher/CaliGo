@@ -1,4 +1,5 @@
 const express = require("express");
+const { requireAuth } = require("@clerk/express");
 const User = require("../models/User");
 const Spot = require("../models/Spot");
 
@@ -14,10 +15,18 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update a user
-router.put("/:id", async (req, res) => {
+// Update a user (Protected Route - Only the authenticated user can update their own account)
+router.put("/:id", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Ensure the authenticated user is the one updating their own account
+    if (req.auth.userId !== id) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to update this user" });
+    }
+
     const [updated] = await User.update(req.body, {
       where: { id: id },
     });
@@ -33,10 +42,18 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Delete a user
-router.delete("/:id", async (req, res) => {
+// Delete a user (Protected Route - Only the authenticated user can delete their own account)
+router.delete("/:id", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Ensure the authenticated user is the one deleting their own account
+    if (req.auth.userId !== id) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to delete this user" });
+    }
+
     const deleted = await User.destroy({
       where: { id: id },
     });
@@ -52,7 +69,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Get all users
-router.get("", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const users = await User.findAll();
     res.status(200).json(users);
@@ -95,14 +112,14 @@ router.get("/:userId/spots", async (req, res) => {
   }
 });
 
-// Get all spots saved by a user
+// Get all spots saved by a user (Assumes a saved spots relation exists)
 router.get("/:userId/saved-spots", async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findByPk(userId, {
       include: {
         model: Spot,
-        as: "SavedSpots",
+        as: "SavedSpots", // Ensure your Spot model has this alias for saved spots
       },
     });
 

@@ -15,10 +15,16 @@ Spot.init(
     spotName: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [1, 100],
+      },
     },
     description: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [1, 500],
+      },
     },
     location: {
       type: DataTypes.STRING,
@@ -30,6 +36,7 @@ Spot.init(
     },
     userId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: User,
         key: "id",

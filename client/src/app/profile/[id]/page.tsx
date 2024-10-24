@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Button from "../../components/button";
+import Button from "../../../components/button";
 import { useSearchParams } from "next/navigation";
 
 export default function ProfilePage() {

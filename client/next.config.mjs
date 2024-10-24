@@ -1,4 +1,4 @@
-import withPWA from 'next-pwa';
+import withPWA from "next-pwa";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,13 +8,26 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV !== "development", // Remove console.log in production
   },
   images: {
-    domains: ["mtek3d.com"],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3001",
+        pathname: "/uploads/**",
+      },
+      // Include other patterns if needed
+      {
+        protocol: "https",
+        hostname: "mtek3d.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
 export default withPWA({
-    dest: "public",         // destination directory for the PWA files
-    disable: process.env.NODE_ENV === "development",        // disable PWA in the development environment
-    register: true,         // register the PWA service worker
-    skipWaiting: true,      // skip waiting for service worker activation
+  dest: "public", // Destination directory for the PWA files
+  disable: process.env.NODE_ENV === "development", // Disable PWA in the development environment
+  register: true, // Register the PWA service worker
+  skipWaiting: true, // Skip waiting for service worker activation
 })(nextConfig);
