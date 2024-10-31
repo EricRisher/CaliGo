@@ -2,12 +2,12 @@ const express = require("express");
 const Comment = require("../models/Comment");
 const Spot = require("../models/Spot");
 const User = require("../models/User");
-const { requireAuth } = require("@clerk/express"); // Clerk's auth middleware
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 // Create a comment (Protected Route)
-router.post("/:spotId", requireAuth(), async (req, res) => {
+router.post("/:spotId", authMiddleware, async (req, res) => {
   try {
     const { commentText } = req.body;
     const userId = req.auth.userId; // Get the authenticated user's ID from Clerk
@@ -59,7 +59,7 @@ router.get("/:spotId", async (req, res) => {
 });
 
 // Update a comment by ID (Protected Route)
-router.put("/:id", requireAuth(), async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {
@@ -81,7 +81,7 @@ router.put("/:id", requireAuth(), async (req, res) => {
 });
 
 // Delete a comment by ID (Protected Route)
-router.delete("/:id", requireAuth(), async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const comment = await Comment.findByPk(req.params.id);
     if (!comment) {

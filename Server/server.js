@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { clerkMiddleware } = require("@clerk/express");
 const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
@@ -14,7 +13,6 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet()); // Use helmet for security
-app.use(clerkMiddleware());
 
 // Helmet Content Security Policy (optional, but enhances security)
 app.use(

@@ -10,9 +10,9 @@ const router = express.Router();
 
 // Use the routes
 router.use("/auth", authRoutes); // Routes under /auth
-router.use("/comments", commentRoutes); // Routes for comments (e.g., /comments/:spotId)
-router.use("/spots", spotRoutes); // Routes for spots (e.g., /spots/:id)
-router.use("/users", userRoutes); // Routes for users (e.g., /users/:id)
+router.use("/comments", commentRoutes); // Routes for comments
+router.use("/spots", spotRoutes); // Routes for spots
+router.use("/users", userRoutes); // Routes for users
 
 // Export the router
 module.exports = router;

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Navigation } from "../../components/navbar";
 import { Header } from "../../components/header";
 import { AddSpotForm } from "../../components/addSpotForm"; // Named import
+import ProtectedPage from "@/components/ProtectedPage";
 
 const CustomMap = dynamic(() => import("../../components/map"), { ssr: false });
 
@@ -35,6 +36,7 @@ export default function MapPage() {
   }, [pathname]); 
 
   return (
+    <ProtectedPage>
     <div className="relative">
       <Header />
       <CustomMap />
@@ -50,5 +52,6 @@ export default function MapPage() {
 
       <Navigation />
     </div>
+    </ProtectedPage>
   );
 }

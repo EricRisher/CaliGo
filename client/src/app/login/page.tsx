@@ -5,27 +5,26 @@ import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function LoginPage() {
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setError(null);
       const response = await axios.post(
-        "http://localhost:3001/auth/signup", // Express URL
-        { email, username, password },
+        "http://localhost:3001/auth/login", // Express URL
+        { username, password },
         { withCredentials: true } // Enables cookies
       );
-      if (response.status === 201) {
-        router.push("/login"); // Redirect to login on success
+      if (response.status === 200) {
+        router.push("/home"); // Redirect to home on success
       }
     } catch (err) {
-      setError("Error creating account. Please try again.");
+      setError("Invalid username or password. Please try again.");
     }
   };
 
@@ -40,19 +39,11 @@ export default function SignupPage() {
           className="logo"
         />
         <form
-          onSubmit={handleSignup}
+          onSubmit={handleLogin}
           className="flex flex-col gap-4 w-80 mt-8 p-4 bg-white rounded-lg shadow-lg"
         >
-          <h2 className="text-xl font-semibold">Create an Account</h2>
+          <h2 className="text-xl font-semibold">Login to CaliGo</h2>
           {error && <p className="text-red-500">{error}</p>}
-          <input
-            type="email"
-            placeholder="Email"
-            className="p-2 border border-gray-300 rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
           <input
             type="text"
             placeholder="Username"
@@ -73,12 +64,12 @@ export default function SignupPage() {
             type="submit"
             className="bg-blue-500 text-white py-2 rounded mt-2"
           >
-            Sign Up
+            Login
           </button>
           <p className="text-sm mt-2">
-            Been Here Before?{" "}
-            <a href="/login" className="text-blue-600">
-              Login
+            New Here?{" "}
+            <a href="/signup" className="text-blue-600">
+              Sign up
             </a>
           </p>
         </form>

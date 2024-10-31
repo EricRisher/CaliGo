@@ -3,7 +3,6 @@
 import Image from "next/image";
 
 export function Header() {
-
   return (
     <header className="header fixed top-0 left-0 w-full flex justify-between items-center bg-primary p-4 shadow-md z-10">
       <Image
@@ -15,13 +14,13 @@ export function Header() {
       />
       <div
         className={
-      
-            "flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md"        }
+          "flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md"
+        }
       >
         <input
           type="text"
           placeholder="Search spots"
-          disabled= {false}
+          disabled={false}
           className={"bg-transparent focus:outline-none"}
         />
         <button>

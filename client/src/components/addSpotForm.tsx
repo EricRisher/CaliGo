@@ -20,9 +20,9 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("spotName", spotName);
-    formData.append("spotDescription", spotDescription);
-    formData.append("spotLocation", spotLocation);
+    formData.append("spotName", spotName); 
+    formData.append("description", spotDescription);
+    formData.append("location", spotLocation);
 
     if (image) {
       formData.append("image", image);

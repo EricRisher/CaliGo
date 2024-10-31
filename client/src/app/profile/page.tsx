@@ -5,6 +5,11 @@ import Image from "next/image";
 import Button from "../../components/button";
 import { useSearchParams } from "next/navigation";
 
+type Spot = {
+  id: number;
+  title: string;
+};
+
 export default function ProfilePage() {
   return (
     <React.Suspense fallback={<div>Loading...</div>}>
@@ -14,10 +19,18 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
+  const [username, setUsername] = useState("Username");
+  const [mySpots, setMySpots] = useState<Spot[]>([]);
+  const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
-  const [username, setUsername] = useState("Username"); // Default username
+
+  const searchParams = useSearchParams();
+  const saved = searchParams.get("saved");
+  const [activeTab, setActiveTab] = useState(
+    saved === "true" ? "Saved Spots" : "My Spots"
+  );
 
   useEffect(() => {
     fetchUserData();
@@ -27,16 +40,17 @@ function ProfileContent() {
     try {
       const response = await fetch("http://localhost:3001/auth/profile", {
         method: "GET",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
 
       if (response.ok) {
         const user = await response.json();
         setUsername(user.username);
+        setMySpots(user.mySpots || []);
+        setSavedSpots(user.savedSpots || []);
         setIsLoggedIn(true);
       } else {
-        // Handle invalid token (e.g., expired, invalid)
-        console.error("Invalid token");
+        console.error("Invalid token or session expired");
         setIsLoggedIn(false);
       }
     } catch (error) {
@@ -45,61 +59,15 @@ function ProfileContent() {
     }
   };
 
-  const getXpForNextLevel = (level: number) => level * 100;
-
-  const searchParams = useSearchParams();
-  const saved = searchParams.get("saved");
-
-  const [activeTab, setActiveTab] = useState(
-    saved === "true" ? "Saved Spots" : "My Spots"
-  );
-
-  const mySpots = [
-    { id: 1, title: "Sunset Cliff" },
-    { id: 2, title: "Beach Vibes" },
-    { id: 3, title: "Mountain Hike" },
-    { id: 4, title: "City Lights" },
-    { id: 5, title: "Desert Safari" },
-  ];
-
-  const savedSpots = [
-    { id: 3, title: "Mountain Hike" },
-    { id: 4, title: "City Lights" },
-    { id: 5, title: "Desert Safari" },
-    { id: 6, title: "Forest Walk" },
-    { id: 7, title: "Lake View" },
-    { id: 8, title: "River Side" },
-    { id: 9, title: "Cave Exploration" },
-    { id: 10, title: "Waterfall" },
-  ];
-
-  const addSpot = () => {
-    const xpForNextLevel = getXpForNextLevel(level);
-    const newXp = xp + 100;
-
-    if (newXp >= xpForNextLevel) {
-      setXp(xpForNextLevel);
-
-      setTimeout(() => {
-        setXp(newXp - xpForNextLevel);
-        setLevel(level + 1);
-        alert("Congratulations! You've leveled up!");
-      }, 500);
-    } else {
-      setXp(newXp);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:3001/auth/logout", {
         method: "POST",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
 
       if (response.ok) {
         setIsLoggedIn(false);
-        alert("You have been logged out!");
         window.location.href = "/";
       } else {
         console.error("Failed to log out");
@@ -109,21 +77,14 @@ function ProfileContent() {
     }
   };
 
+  const getXpForNextLevel = (level: number): number => level * 100;
+
   return (
     <div className="relative flex flex-col min-h-screen bg-primary">
+      {/* Profile Header */}
       <div className="relative w-full p-4 flex justify-between items-center z-10">
-        <button>
-          <Image
-            src="/icons/close.png"
-            alt="Close"
-            width={32}
-            height={32}
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                window.location.href = "/home";
-              }
-            }}
-          />
+        <button onClick={() => (window.location.href = "/home")}>
+          <Image src="/icons/close.png" alt="Close" width={32} height={32} />
         </button>
         <button>
           <Image
@@ -135,28 +96,15 @@ function ProfileContent() {
         </button>
       </div>
 
-      <div className="absolute top-0 left-0 w-full overflow-hidden">
-        {/* SVG content */}
-      </div>
-
+      {/* Profile Picture and Username */}
       <div className="flex flex-col items-center mt-4 relative z-10">
-        <Image
-          src="/icons/user.png"
-          alt="Profile"
-          width={128}
-          height={128}
-          className="mb-2"
-        />
+        <Image src="/icons/user.png" alt="Profile" width={128} height={128} />
         <h1 className="text-2xl">{username}</h1>
       </div>
 
+      {/* XP and Level Section */}
       <section className="flex flex-row justify-around mb-6 relative z-10">
-        <Button className="text-sm mt-2" onClick={addSpot}>
-          Upload Spot (Add XP)
-        </Button>
       </section>
-
-      {/* XP Bar */}
       <div className="relative z-10 w-full px-4 mb-6">
         <div className="flex justify-between text-sm mb-1">
           <span>Level {level}</span>
@@ -167,12 +115,13 @@ function ProfileContent() {
         </div>
         <div className="w-full bg-gray-700 h-4 rounded-full overflow-hidden">
           <div
-            className="bg-blue-500 h-full progress-bar"
+            className="bg-blue-500 h-full"
             style={{ width: `${(xp / getXpForNextLevel(level)) * 100}%` }}
-          ></div>
+          />
         </div>
       </div>
 
+      {/* Tabs for My Spots and Saved Spots */}
       <div className="w-full px-4 relative z-10 bg-slate-300">
         <div className="flex space-x-4 m-4">
           <button
@@ -197,6 +146,7 @@ function ProfileContent() {
           </button>
         </div>
 
+        {/* Display My Spots or Saved Spots */}
         <div className="grid grid-cols-2 gap-4">
           {activeTab === "My Spots" &&
             mySpots.map((spot) => (
@@ -219,6 +169,7 @@ function ProfileContent() {
         </div>
       </div>
 
+      {/* Footer with Log Out Option */}
       <div className="flex justify-around w-full bg-transparent p-4 mt-auto relative z-10">
         <a href="/credit" className="text-black hover:underline">
           Credit

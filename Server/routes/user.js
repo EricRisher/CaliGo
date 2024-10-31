@@ -1,7 +1,7 @@
 const express = require("express");
-const { requireAuth } = require("@clerk/express");
 const User = require("../models/User");
 const Spot = require("../models/Spot");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update a user (Protected Route - Only the authenticated user can update their own account)
-router.put("/:id", requireAuth(), async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -43,7 +43,7 @@ router.put("/:id", requireAuth(), async (req, res) => {
 });
 
 // Delete a user (Protected Route - Only the authenticated user can delete their own account)
-router.delete("/:id", requireAuth(), async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -2,13 +2,13 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Spot, User, Comment, SpotLike } = require("../models/Index");
-const { requireAuth } = require("@clerk/express"); // Clerk's authentication middleware
+const { Spot, User, Comment, SpotLike } = require("../models");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 // Create the upload path if it doesn't exist
-const uploadPath = path.resolve(__dirname, "../client/public/uploads");
+const uploadPath = path.resolve("/Client/public/uploads");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
@@ -26,44 +26,43 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Create a new spot (Protected Route)
-router.post("/", requireAuth(), upload.single("image"), async (req, res) => {
+router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
-    const { spotName, spotDescription, spotLocation } = req.body;
+    const { spotName, description, location } = req.body;
 
-    const imagePath = req.file
-      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
-      : null;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    // Access userId from req.user (assuming authenticateToken sets it correctly)
+    const userId = req.user.id;
 
     const newSpot = await Spot.create({
       spotName,
-      description: spotDescription,
-      location: spotLocation,
+      description,
+      location,
       image: imagePath,
-      userId: req.auth.userId, // Clerk's authenticated user ID
+      userId, // Set userId here
     });
 
     res.status(201).json(newSpot);
   } catch (error) {
     console.error("Error creating new spot:", error);
-    res.status(500).json({ error: "Failed to add the spot" });
+    res.status(500).json({ message: "Failed to add the spot" });
   }
 });
 
 // Get all spots
 router.get("/", async (req, res) => {
   try {
-    const spots = await Spot.findAll({
-      include: [
-        {
-          model: User,
-          attributes: { exclude: ["password"] },
-        },
-      ],
-    });
+const spots = await Spot.findAll({
+  include: [
+    { model: User, as: "creator", attributes: ["id", "username"] },
+    { model: Comment, as: "Comments", attributes: ["id", "commentText"] }, 
+  ],
+});
     res.status(200).json(spots);
   } catch (error) {
     console.error("Error fetching spots:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Failed to fetch spots" });
   }
 });
 
@@ -92,7 +91,7 @@ router.get("/:spotId", async (req, res) => {
 });
 
 // Update a spot by spotId (Protected Route)
-router.put("/:spotId", requireAuth(), async (req, res) => {
+router.put("/:spotId", authMiddleware, async (req, res) => {
   try {
     const spot = await Spot.findByPk(req.params.spotId);
     if (!spot) {
@@ -114,7 +113,7 @@ router.put("/:spotId", requireAuth(), async (req, res) => {
 });
 
 // Delete a spot by spotId (Protected Route)
-router.delete("/:spotId", requireAuth(), async (req, res) => {
+router.delete("/:spotId", authMiddleware, async (req, res) => {
   try {
     const spot = await Spot.findByPk(req.params.spotId);
     if (!spot) {
@@ -136,7 +135,7 @@ router.delete("/:spotId", requireAuth(), async (req, res) => {
 });
 
 // Like a spot (Protected Route)
-router.post("/:spotId/like", requireAuth(), async (req, res) => {
+router.post("/:spotId/like", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
 
   try {
@@ -168,7 +167,7 @@ router.post("/:spotId/like", requireAuth(), async (req, res) => {
 });
 
 // Unlike a spot (Protected Route)
-router.delete("/:spotId/unlike", requireAuth(), async (req, res) => {
+router.delete("/:spotId/unlike", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
 
   try {
