@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 type CommentPreviewProps = {
-  comments: { commentText: string; username: string }[]; // Array of comments
-  onFetchComments: () => Promise<{ commentText: string; username: string }[]>; // Function to fetch comments
-  spotId: number; // Pass the spot ID to submit the comment to the right post
+  comments: { commentText: string; username: string }[];
+  onFetchComments: () => Promise<{ commentText: string; username: string }[]>;
+  spotId: number;
 };
 
 export function CommentPreview({
@@ -12,16 +12,29 @@ export function CommentPreview({
   spotId,
 }: CommentPreviewProps) {
   const [showAllComments, setShowAllComments] = useState(false);
-  const [newComment, setNewComment] = useState(""); // State to store the input for new comment
-  const [commentList, setCommentList] = useState(comments); // Local state to store comments
+  const [newComment, setNewComment] = useState("");
+  const [commentList, setCommentList] = useState<
+    { commentText: string; username: string }[]
+  >([]);
 
   useEffect(() => {
-    // When showAllComments is triggered, fetch comments from the backend
+    // Initial fetch for comments when component mounts
+    (async () => {
+      try {
+        const fetchedComments = await onFetchComments();
+        setCommentList(fetchedComments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    })();
+  }, [onFetchComments]);
+
+  useEffect(() => {
     if (showAllComments) {
       (async () => {
         try {
           const fetchedComments = await onFetchComments();
-          setCommentList(fetchedComments); // Update commentList with fetched comments
+          setCommentList(fetchedComments);
         } catch (error) {
           console.error("Error fetching comments:", error);
         }
@@ -34,7 +47,7 @@ export function CommentPreview({
   };
 
   const handleNewCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewComment(e.target.value); // Handle input change
+    setNewComment(e.target.value);
   };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
@@ -42,14 +55,13 @@ export function CommentPreview({
     if (newComment.trim() === "") return;
 
     try {
-      // Post the new comment to the backend
       const response = await fetch(`http://localhost:3001/comments/${spotId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Include cookies in the request
-        body: JSON.stringify({ commentText: newComment }), // Corrected line
+        credentials: "include",
+        body: JSON.stringify({ commentText: newComment }),
       });
 
       if (!response.ok) {
@@ -57,17 +69,13 @@ export function CommentPreview({
       }
 
       const newCommentFromServer = await response.json();
+      console.log("New comment from server:", newCommentFromServer);
 
-      // Update local comment list with the new comment
-      setCommentList((prevList) => [
-        ...prevList,
-        {
-          commentText: newCommentFromServer.commentText,
-          username: newCommentFromServer.User.username,
-        },
-      ]);
+      // Refetch comments to update list
+      const updatedComments = await onFetchComments();
+      setCommentList(updatedComments);
 
-      setNewComment(""); // Reset input after submission
+      setNewComment("");
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -76,14 +84,12 @@ export function CommentPreview({
   return (
     <div>
       <button onClick={handleViewAllComments} className="hover:underline mt-2">
-        {showAllComments ? "Hide Comments" : "View All Comments"}
+         View All Comments
       </button>
 
       {showAllComments && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-end mb-[92px]">
-          {/* Comment modal with fixed "Close" button and input field */}
           <div className="bg-white rounded-t-lg max-h-[80%] w-full flex flex-col">
-            {/* Fixed "Close" button */}
             <div className="sticky top-0 p-4 bg-white z-10 border-b">
               <button
                 onClick={handleViewAllComments}
@@ -93,16 +99,18 @@ export function CommentPreview({
               </button>
             </div>
 
-            {/* Scrollable comments section */}
             <div className="flex-grow overflow-y-auto p-4 max-h-[30vh]">
-              {commentList.map((comment, index) => (
-                <p key={index} className="text-sm">
-                  <strong>{comment.username}:</strong> {comment.commentText}
-                </p>
-              ))}
+              {commentList.length > 0 ? (
+                commentList.map((comment, index) => (
+                  <p key={index} className="text-sm">
+                    <strong>{comment.username}:</strong> {comment.commentText}
+                  </p>
+                ))
+              ) : (
+                <p>No comments yet.</p>
+              )}
             </div>
 
-            {/* Fixed "Add a comment" input at the bottom */}
             <div className="sticky bottom-0 p-4 bg-white border-t">
               <form onSubmit={handleCommentSubmit}>
                 <input

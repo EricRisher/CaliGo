@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "../../components/button";
-import { useSearchParams } from "next/navigation";
 
 type Spot = {
   id: number;
   title: string;
+  image: string; // Add image to the Spot type
 };
 
 export default function ProfilePage() {
@@ -26,6 +27,7 @@ function ProfileContent() {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
 
+  const router = useRouter();
   const searchParams = useSearchParams();
   const saved = searchParams.get("saved");
   const [activeTab, setActiveTab] = useState(
@@ -103,8 +105,7 @@ function ProfileContent() {
       </div>
 
       {/* XP and Level Section */}
-      <section className="flex flex-row justify-around mb-6 relative z-10">
-      </section>
+      <section className="flex flex-row justify-around mb-6 relative z-10"></section>
       <div className="relative z-10 w-full px-4 mb-6">
         <div className="flex justify-between text-sm mb-1">
           <span>Level {level}</span>
@@ -147,14 +148,23 @@ function ProfileContent() {
         </div>
 
         {/* Display My Spots or Saved Spots */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           {activeTab === "My Spots" &&
             mySpots.map((spot) => (
               <div
                 key={spot.id}
-                className="bg-blue-300 rounded-md h-32 flex items-center justify-center"
+                className="relative overflow-hidden rounded-lg shadow-md"
+                style={{ width: "100%", aspectRatio: "1 / 1" }} // Fixed aspect ratio
               >
-                <p>{spot.title}</p>
+                <button onClick={() => router.push(`/spot/${spot.id}`)}>
+                  <Image
+                    src={`http://localhost:3001${spot.image}`} // Display the spot image
+                    alt={spot.title}
+                    width={128}
+                    height={128}
+                    className="rounded-md"
+                  />
+                </button>
               </div>
             ))}
           {activeTab === "Saved Spots" &&

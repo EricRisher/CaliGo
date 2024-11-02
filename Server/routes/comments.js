@@ -6,15 +6,21 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Create a comment (Protected Route)
 router.post("/:spotId", authMiddleware, async (req, res) => {
   try {
     const { commentText } = req.body;
-    const userId = req.auth.userId; // Get the authenticated user's ID from Clerk
+
+    // Access the authenticated user's ID directly as `req.user.id`
+    const userId = req.user.id;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ error: "User ID is missing from request." });
+    }
 
     const newComment = await Comment.create({
       commentText,
-      userId,
+      userId, // Properly pass the `userId`
       spotId: req.params.spotId,
     });
 
@@ -22,7 +28,8 @@ router.post("/:spotId", authMiddleware, async (req, res) => {
     const commentWithUser = await Comment.findByPk(newComment.id, {
       include: {
         model: User,
-        attributes: ["id", "username"], // Include only necessary attributes
+        as: "commentAuthor", // Ensure alias matches the model definition
+        attributes: ["id", "username"],
       },
     });
 
@@ -41,7 +48,8 @@ router.get("/:spotId", async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ["username"], // Fetch only username
+          as: "commentAuthor", // Use the correct alias here
+          attributes: ["username"], // Fetch only the username
         },
       ],
     });
@@ -54,6 +62,7 @@ router.get("/:spotId", async (req, res) => {
 
     res.status(200).json(comments);
   } catch (error) {
+    console.error("Error fetching comments:", error);
     res.status(500).json({ error: error.message });
   }
 });

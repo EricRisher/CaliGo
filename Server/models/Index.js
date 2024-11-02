@@ -2,7 +2,7 @@
 const User = require("./User");
 const Spot = require("./Spot");
 const Comment = require("./Comment");
-const SpotLike = require("./SpotLike");
+const Like = require("./Like");
 const SavedSpot = require("./SavedSpot");
 
 // User-Spot (Created Spots) Relationship
@@ -20,38 +20,37 @@ Spot.belongsTo(User, {
 // User-Comment Relationship
 User.hasMany(Comment, {
   foreignKey: "userId",
-  as: "userComments", // Alias for user's comments
+  as: "userComments",
   onDelete: "CASCADE",
 });
 Comment.belongsTo(User, {
   foreignKey: "userId",
-  as: "commentAuthor", // Reference to comment author
+  as: "commentAuthor",
   onDelete: "CASCADE",
 });
 
 // Spot-Comment Relationship
 Spot.hasMany(Comment, {
   foreignKey: "spotId",
-  as: "Comments", // Align this alias with what Sequelize expects
+  as: "Comments",
   onDelete: "CASCADE",
 });
 Comment.belongsTo(Spot, {
   foreignKey: "spotId",
-  as: "commentedSpot", // Reference to spot being commented on
+  as: "commentedSpot",
   onDelete: "CASCADE",
 });
 
 // User-Spot (Liked Spots) Many-to-Many Relationship
 User.belongsToMany(Spot, {
-  through: SpotLike,
+  through: Like,
   as: "LikedSpots",
   foreignKey: "userId",
   otherKey: "spotId",
   onDelete: "CASCADE",
 });
-
 Spot.belongsToMany(User, {
-  through: SpotLike,
+  through: Like,
   as: "UsersWhoLiked",
   foreignKey: "spotId",
   otherKey: "userId",
@@ -66,7 +65,6 @@ User.belongsToMany(Spot, {
   otherKey: "spotId",
   onDelete: "CASCADE",
 });
-
 Spot.belongsToMany(User, {
   through: SavedSpot,
   as: "UsersWhoSaved",
@@ -75,4 +73,5 @@ Spot.belongsToMany(User, {
   onDelete: "CASCADE",
 });
 
-module.exports = { User, Spot, Comment, SpotLike, SavedSpot };
+// Export all models for use in other files
+module.exports = { User, Spot, Comment, Like, SavedSpot };

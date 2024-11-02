@@ -2,7 +2,7 @@
 const jwt = require("jsonwebtoken");
 
 const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token; // Retrieve token from cookies
+  const token = req.cookies.token;
 
   if (!token) {
     return res
@@ -12,7 +12,8 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach decoded token data (e.g., userId) to req.user
+    req.user = decoded; // Attach decoded token data
+    console.log("Decoded JWT Payload:", req.user); // Debugging line to verify contents
     next();
   } catch (error) {
     console.error("JWT verification failed:", error);

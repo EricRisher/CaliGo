@@ -17,7 +17,6 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
     const formData = new FormData();
     formData.append("spotName", spotName); 

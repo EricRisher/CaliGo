@@ -7,7 +7,7 @@ import { CommentPreview } from "../components/commentPreview";
 // Define interfaces for Spot, Comment, and User
 interface Comment {
   commentText: string;
-  User: {
+  commentAuthor: {
     username: string;
   };
 }
@@ -24,9 +24,11 @@ interface Spot {
   image: string;
   User: User;
   comments?: Comment[];
+  commentCount?: number;
   likes: number;
   userLiked: boolean;
   updatedAt: string;
+  creator: User;
 }
 
 export function Spots({ spotId }: { spotId?: string }) {
@@ -38,27 +40,28 @@ export function Spots({ spotId }: { spotId?: string }) {
   }>({});
   const [commentsData, setCommentsData] = useState<{ [id: number]: Comment[] }>(
     {}
-  ); // Store comments for each spot
+  );
 
-  // Fetch spots or a specific spot based on the spotId
+  const userId = 1; // Example user ID, replace with actual logged-in user ID
+
   useEffect(() => {
     const fetchSpots = async () => {
       try {
         const response = await fetch(
           spotId
-            ? `http://localhost:3001/spots/${spotId}` // Fetch a specific spot
-            : `http://localhost:3001/spots` // Fetch all spots
+            ? `http://localhost:3001/spots/${spotId}`
+            : `http://localhost:3001/spots`
         );
         const data = await response.json();
-
-        // If fetching a single spot, wrap it in an array for consistent rendering
         const spotArray = spotId ? [data] : data;
 
-        // Initialize likedPosts state based on the userLiked field from the backend
-        const likedPostsState = spotArray.reduce((acc, spot) => {
-          acc[spot.id] = spot.userLiked;
-          return acc;
-        }, {} as { [id: number]: boolean });
+        const likedPostsState = spotArray.reduce(
+          (acc: { [id: number]: boolean }, spot: Spot) => {
+            acc[spot.id] = spot.userLiked;
+            return acc;
+          },
+          {} as { [id: number]: boolean }
+        );
 
         setLikedPosts(likedPostsState);
         setSpotsData(spotArray);
@@ -72,18 +75,19 @@ export function Spots({ spotId }: { spotId?: string }) {
     fetchSpots();
   }, [spotId]);
 
-  // Fetch comments for a specific spot
   const fetchComments = async (spotId: number) => {
     try {
       const response = await fetch(`http://localhost:3001/comments/${spotId}`);
       const comments = await response.json();
-      setCommentsData((prev) => ({ ...prev, [spotId]: comments }));
+      setCommentsData((prev) => ({
+        ...prev,
+        [spotId]: Array.isArray(comments) ? comments : [],
+      }));
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   };
 
-  // Function to handle like/unlike functionality
   const toggleLike = async (spotId: number) => {
     const isLiked = likedPosts[spotId];
     const url = `http://localhost:3001/spots/${spotId}/${
@@ -94,13 +98,12 @@ export function Spots({ spotId }: { spotId?: string }) {
       const response = await fetch(url, {
         method: isLiked ? "DELETE" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: 1 }), // Replace with actual logged-in user ID
+        credentials: "include", // Ensure credentials are sent
+        body: JSON.stringify({ userId }), // Assuming you are sending userId as part of the request
       });
 
       if (response.ok) {
-        const { likes } = await response.json(); // Get updated likes count from server
-
-        // Update like status and like count in the UI
+        const { likes } = await response.json();
         setSpotsData((prevSpots) =>
           prevSpots.map((spot) =>
             spot.id === spotId ? { ...spot, likes } : spot
@@ -115,7 +118,6 @@ export function Spots({ spotId }: { spotId?: string }) {
     }
   };
 
-  // Function to toggle bookmark state for individual posts
   const toggleBookmark = (id: number) => {
     setBookmarkedPosts((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -152,7 +154,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           <div className="bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
               <Image
-                src={spot.image}
+                src={`http://localhost:3001${spot.image}`}
                 alt={spot.spotName}
                 width={500}
                 height={500}
@@ -162,7 +164,8 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div className="flex justify-between items-center">
             <div className="flex space-x-4 items-center">
-              <button onClick={() => toggleLike(spot.id)}>
+              {/*onClick={() => toggleLike(spot.id)*/}
+              <button>
                 <Image
                   src={
                     likedPosts[spot.id]
@@ -174,8 +177,7 @@ export function Spots({ spotId }: { spotId?: string }) {
                   height={32}
                 />
               </button>
-              <span>{spot.likes}</span> {/* Display the like count */}
-              {/* Comment counter */}
+              <span>{spot.likes}</span>
               <button>
                 <Image
                   src="/icons/chat-box.png"
@@ -184,8 +186,7 @@ export function Spots({ spotId }: { spotId?: string }) {
                   height={32}
                 />
               </button>
-              <span>{commentsData[spot.id]?.length || 0}</span>{" "}
-              {/* Display the comment count */}
+              <span>{spot.commentCount || 0}</span>
             </div>
             <button onClick={() => toggleBookmark(spot.id)}>
               <Image
@@ -197,20 +198,20 @@ export function Spots({ spotId }: { spotId?: string }) {
                 alt="Save"
                 width={32}
                 height={32}
+                hidden={true}
               />
             </button>
           </div>
           <div>
             <p className="m-0 pt-2">
-              <b>{spot.User?.username}</b> {spot.description}
+              <b>{spot.creator?.username}</b> {spot.description}
             </p>
           </div>
-          {/* Fetch and display comments */}
           <CommentPreview
             comments={
               commentsData[spot.id]?.map((comment) => ({
                 commentText: comment.commentText,
-                username: comment.User?.username, // Ensure you access the User object
+                username: comment.commentAuthor?.username || "Anonymous",
               })) || []
             }
             onFetchComments={async () => {
@@ -218,12 +219,14 @@ export function Spots({ spotId }: { spotId?: string }) {
                 `http://localhost:3001/comments/${spot.id}`
               );
               const fetchedComments = await response.json();
-              return fetchedComments.map((comment: Comment) => ({
-                commentText: comment.commentText,
-                username: comment.User.username,
-              }));
+              return Array.isArray(fetchedComments)
+                ? fetchedComments.map((comment: Comment) => ({
+                    commentText: comment.commentText,
+                    username: comment.commentAuthor?.username || "Anonymous",
+                  }))
+                : [];
             }}
-            spotId={spot.id} // Pass the spotId here
+            spotId={spot.id}
           />
           <div className="mt-1 font-normal">
             {new Date(spot.updatedAt).toLocaleDateString()}
