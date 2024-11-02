@@ -12,7 +12,7 @@ export default function SpotDetail() {
     <div className="flex flex-col min-h-screen bg-[#f0f0f0]">
       <Header />
       <main className="flex-grow p-4 py-[100px]">
-        <Spots spotId={id} /> 
+        <Spots spotId={Array.isArray(id) ? id[0] : id} />
       </main>
       <Navigation />
     </div>
