@@ -26,7 +26,11 @@ app.use(
 );
 
 // CORS configuration (Limit origins for better security)
-const allowedOrigins = ["http://localhost:3001", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3001",
+  "http://localhost:3000",
+  "http://192.168.1.37:3000",
+];
 app.use(
   cors({
     origin: allowedOrigins,
