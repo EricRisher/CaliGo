@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Navigation } from "../../components/navbar";
@@ -8,7 +7,7 @@ import { Header } from "../../components/header";
 import { AddSpotForm } from "../../components/addSpotForm"; // Named import
 import ProtectedPage from "@/components/ProtectedPage";
 
-const CustomMap = dynamic(() => import("../../components/map"), { ssr: false });
+import CustomMap from "@/components/map";
 
 export default function MapPage() {
   const [showForm, setShowForm] = useState(false);
