@@ -24,10 +24,6 @@
     "sequelize": "^6.37.3",
     "ws": "^8.18.0"
   },
-  "engines": {
-    "node": "22.x",
-    "npm": "10.x"
-  },
   "name": "caligo",
   "version": "1.0.0",
   "main": "server.js",

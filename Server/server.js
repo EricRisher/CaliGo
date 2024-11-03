@@ -31,6 +31,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://192.168.1.37:3000",
   "http://192.167.1.37:3001",
+  "http://caligo.site",
+  "https://caligo.site",
 ];
 app.use(
   cors({
