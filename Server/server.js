@@ -3,18 +3,17 @@ const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
-const cookieParser = require("cookie-parser"); // Add this for handling cookies
+const cookieParser = require("cookie-parser");
 const routes = require("./routes");
-
 const sequelize = require("./config/connection");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(helmet()); // Use helmet for security
+// Security middleware
+app.use(helmet());
 
-// Helmet Content Security Policy (optional, but enhances security)
+// Optional: Helmet Content Security Policy
 app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
@@ -25,7 +24,7 @@ app.use(
   })
 );
 
-// CORS configuration (Limit origins for better security)
+// CORS configuration
 const allowedOrigins = [
   "http://localhost:3001",
   "http://localhost:3000",
@@ -36,37 +35,56 @@ const allowedOrigins = [
   "http://www.caligo.site",
   "https://www.caligo.site",
 ];
+
 app.use(
   cors({
-    origin: allowedOrigins,
-    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow credentials (cookies)
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders:
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
   })
 );
 
+// Preflight requests for all routes
+app.options("*", cors());
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // Parses cookies
+app.use(cookieParser());
 
-// Serve static assets
+// Static asset serving
 app.use(express.static(path.join(__dirname, "public")));
-
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 
+// Health check route
 app.get("/", (req, res) => {
   res.send("Backend server is running!");
 });
 
-// Routes
+// Custom routes
 app.use(routes);
 
+// Error handling for server and CORS
 app.use((err, req, res, next) => {
   console.error("Server Error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
+  if (err.message.includes("CORS")) {
+    res.status(403).json({ error: "CORS policy blocked this request." });
+  } else {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // Start server and sync database
 sequelize.sync({ force: false }).then(() => {
   app.listen(PORT, () =>
-    console.log(`Now listening on http://localhost:${PORT}`)
+    console.log(`Server running at http://localhost:${PORT}`)
   );
 });
