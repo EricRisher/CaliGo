@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import Button from "../../components/button";
 
 type Spot = {
   id: number;
@@ -27,7 +26,7 @@ function ProfileContent() {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Use environment variable for the API URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL; 
   const router = useRouter();
   const searchParams = useSearchParams();
   const saved = searchParams.get("saved");
