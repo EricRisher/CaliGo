@@ -42,15 +42,14 @@ export function Spots({ spotId }: { spotId?: string }) {
     {}
   );
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Use the environment variable
   const userId = 1; // Example user ID, replace with actual logged-in user ID
 
   useEffect(() => {
     const fetchSpots = async () => {
       try {
         const response = await fetch(
-          spotId
-            ? `http://localhost:3001/spots/${spotId}`
-            : `http://localhost:3001/spots`
+          spotId ? `${apiUrl}/spots/${spotId}` : `${apiUrl}/spots`
         );
         const data = await response.json();
         const spotArray = spotId ? [data] : data;
@@ -73,11 +72,11 @@ export function Spots({ spotId }: { spotId?: string }) {
     };
 
     fetchSpots();
-  }, [spotId]);
+  }, [spotId, apiUrl]);
 
   const fetchComments = async (spotId: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/comments/${spotId}`);
+      const response = await fetch(`${apiUrl}/comments/${spotId}`);
       const comments = await response.json();
       setCommentsData((prev) => ({
         ...prev,
@@ -90,9 +89,7 @@ export function Spots({ spotId }: { spotId?: string }) {
 
   const toggleLike = async (spotId: number) => {
     const isLiked = likedPosts[spotId];
-    const url = `http://localhost:3001/spots/${spotId}/${
-      isLiked ? "unlike" : "like"
-    }`;
+    const url = `${apiUrl}/spots/${spotId}/${isLiked ? "unlike" : "like"}`;
 
     try {
       const response = await fetch(url, {
@@ -154,7 +151,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           <div className="bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
               <Image
-                src={`http://localhost:3001${spot.image}`}
+                src={`${apiUrl}${spot.image}`}
                 alt={spot.spotName}
                 width={500}
                 height={500}
@@ -164,7 +161,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div className="flex justify-between items-center">
             <div className="flex space-x-4 items-center">
-              <button onClick={() => toggleLike(spot.id)}>
+              <button>
                 <Image
                   src={
                     likedPosts[spot.id]
@@ -197,6 +194,7 @@ export function Spots({ spotId }: { spotId?: string }) {
                 alt="Save"
                 width={32}
                 height={32}
+                hidden={true}
               />
             </button>
           </div>
@@ -213,9 +211,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               })) || []
             }
             onFetchComments={async () => {
-              const response = await fetch(
-                `http://localhost:3001/comments/${spot.id}`
-              );
+              const response = await fetch(`${apiUrl}/comments/${spot.id}`);
               const fetchedComments = await response.json();
               return Array.isArray(fetchedComments)
                 ? fetchedComments.map((comment: Comment) => ({

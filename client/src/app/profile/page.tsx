@@ -8,7 +8,7 @@ import Button from "../../components/button";
 type Spot = {
   id: number;
   title: string;
-  image: string; // Add image to the Spot type
+  image: string;
 };
 
 export default function ProfilePage() {
@@ -27,6 +27,7 @@ function ProfileContent() {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Use environment variable for the API URL
   const router = useRouter();
   const searchParams = useSearchParams();
   const saved = searchParams.get("saved");
@@ -40,7 +41,7 @@ function ProfileContent() {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://localhost:3001/auth/profile", {
+      const response = await fetch(`${apiUrl}/auth/profile`, {
         method: "GET",
         credentials: "include",
       });
@@ -63,7 +64,7 @@ function ProfileContent() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3001/auth/logout", {
+      const response = await fetch(`${apiUrl}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -154,11 +155,11 @@ function ProfileContent() {
               <div
                 key={spot.id}
                 className="relative overflow-hidden rounded-lg shadow-md"
-                style={{ width: "100%", aspectRatio: "1 / 1" }} // Fixed aspect ratio
+                style={{ width: "100%", aspectRatio: "1 / 1" }}
               >
                 <button onClick={() => router.push(`/spot/${spot.id}`)}>
                   <Image
-                    src={`http://localhost:3001${spot.image}`} // Display the spot image
+                    src={`${apiUrl}${spot.image}`}
                     alt={spot.title}
                     width={128}
                     height={128}
