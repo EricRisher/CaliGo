@@ -17,26 +17,29 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     const formData = new FormData();
-    formData.append("spotName", spotName); 
+    formData.append("spotName", spotName);
     formData.append("description", spotDescription);
     formData.append("location", spotLocation);
-
     if (image) {
       formData.append("image", image);
     }
 
     try {
-      const response = await fetch("http://localhost:3001/spots", {
-        method: "POST",
-        body: formData,
-        credentials: "include", // Ensure that cookies/credentials are sent
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/spots`, // Use environment variable
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        // Handle success, update state, close form, etc.
+        closeForm(); // Optionally close the form on success
       } else {
         const errorData = await response.json();
         console.error("Error submitting form:", errorData.error);
@@ -47,6 +50,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
       alert("An error occurred while adding the spot.");
     }
   };
+
 
   return (
     <div className="max-w-lg mx-auto">

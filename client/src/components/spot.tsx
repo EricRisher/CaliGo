@@ -164,8 +164,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div className="flex justify-between items-center">
             <div className="flex space-x-4 items-center">
-              {/*onClick={() => toggleLike(spot.id)*/}
-              <button>
+              <button onClick={() => toggleLike(spot.id)}>
                 <Image
                   src={
                     likedPosts[spot.id]
@@ -198,7 +197,6 @@ export function Spots({ spotId }: { spotId?: string }) {
                 alt="Save"
                 width={32}
                 height={32}
-                hidden={true}
               />
             </button>
           </div>

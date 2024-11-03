@@ -12,22 +12,22 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setError(null);
-      const response = await axios.post(
-        "http://localhost:3001/auth/signup", // Express URL
-        { email, username, password },
-        { withCredentials: true } // Enables cookies
-      );
-      if (response.status === 201) {
-        router.push("/login"); // Redirect to login on success
-      }
-    } catch (err) {
-      setError("Error creating account. Please try again.");
+const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  try {
+    setError(null);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, // Dynamic URL
+      { email, username, password },
+      { withCredentials: true } // Enables cookies
+    );
+    if (response.status === 201) {
+      router.push("/login"); // Redirect to login on success
     }
-  };
+  } catch (err) {
+    setError("Error creating account. Please try again.");
+  }
+};
 
   return (
     <div className="flex flex-col min-h-screen">

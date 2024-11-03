@@ -11,22 +11,22 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setError(null);
-      const response = await axios.post(
-        "http://localhost:3001/auth/login", // Express URL
-        { username, password },
-        { withCredentials: true } // Enables cookies
-      );
-      if (response.status === 200) {
-        router.push("/home"); // Redirect to home on success
-      }
-    } catch (err) {
-      setError("Invalid username or password. Please try again.");
-    }
-  };
+ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+   e.preventDefault();
+   try {
+     setError(null);
+     const response = await axios.post(
+       `${process.env.NEXT_PUBLIC_API_URL}/auth/login`, // Dynamic URL
+       { username, password },
+       { withCredentials: true } // Enables cookies
+     );
+     if (response.status === 200) {
+       router.push("/home"); // Redirect to home on success
+     }
+   } catch (err) {
+     setError("Invalid username or password. Please try again.");
+   }
+ };
 
   return (
     <div className="flex flex-col min-h-screen">

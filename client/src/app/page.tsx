@@ -31,9 +31,6 @@ export default function Home() {
           </Button>
         </section>
         <footer className="flex justify-evenly items-center w-full bg-transparent mt-auto p-4">
-          <a href="https://www.ericrisher.com" className=" hover:underline">
-            by Eric Risher
-          </a>
           <a href="/legal" className=" hover:underline">
             Legal
           </a>
@@ -41,7 +38,10 @@ export default function Home() {
             href="https://github.com/EricRisher/CaliGo"
             className=" hover:underline"
           >
-            v1.0.0
+            v2.2.6
+          </a>
+          <a href="https://www.ericrisher.com" className=" hover:underline">
+            by <b>Eric Risher</b>
           </a>
         </footer>
       </main>

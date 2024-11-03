@@ -1,21 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-import { ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
 
 export default function ProtectedPage({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Track loading state
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:3001/auth/profile", {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (response.ok) {
           setIsAuthenticated(true); // User is authenticated
@@ -31,7 +32,10 @@ export default function ProtectedPage({ children }: { children: ReactNode }) {
     checkAuth();
   }, [router]);
 
-  if (!isAuthenticated) return null; // Optionally show a loading indicator
+  if (isAuthenticated === null) {
+    // Show a loading indicator while checking authentication
+    return <div>Loading...</div>;
+  }
 
-  return <>{children}</>; // Render child components if authenticated
+  return <>{children}</>; // Render children if authenticated
 }

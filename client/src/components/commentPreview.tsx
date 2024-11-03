@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 
 type CommentPreviewProps = {
@@ -13,68 +14,48 @@ export function CommentPreview({
 }: CommentPreviewProps) {
   const [showAllComments, setShowAllComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [commentList, setCommentList] = useState<
-    { commentText: string; username: string }[]
-  >([]);
+  const [commentList, setCommentList] = useState(comments);
 
-  useEffect(() => {
-    // Initial fetch for comments when component mounts
-    (async () => {
-      try {
-        const fetchedComments = await onFetchComments();
-        setCommentList(fetchedComments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    })();
-  }, [onFetchComments]);
-
-  useEffect(() => {
-    if (showAllComments) {
-      (async () => {
-        try {
-          const fetchedComments = await onFetchComments();
-          setCommentList(fetchedComments);
-        } catch (error) {
-          console.error("Error fetching comments:", error);
-        }
-      })();
+  // Unified function to fetch comments
+  const fetchComments = async () => {
+    try {
+      const fetchedComments = await onFetchComments();
+      setCommentList(fetchedComments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
     }
-  }, [showAllComments, onFetchComments]);
-
-  const handleViewAllComments = () => {
-    setShowAllComments(!showAllComments);
   };
 
-  const handleNewCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    // Fetch comments only when `showAllComments` is true
+    if (showAllComments) {
+      fetchComments();
+    }
+  }, [showAllComments]);
+
+  const handleViewAllComments = () => setShowAllComments((prev) => !prev);
+
+  const handleNewCommentChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNewComment(e.target.value);
-  };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() === "") return;
 
     try {
-      const response = await fetch(`http://localhost:3001/comments/${spotId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ commentText: newComment }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/comments/${spotId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ commentText: newComment }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Failed to submit comment");
-      }
+      if (!response.ok) throw new Error("Failed to submit comment");
 
-      const newCommentFromServer = await response.json();
-      console.log("New comment from server:", newCommentFromServer);
-
-      // Refetch comments to update list
-      const updatedComments = await onFetchComments();
-      setCommentList(updatedComments);
-
+      await fetchComments(); // Refresh comments after posting a new one
       setNewComment("");
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -84,7 +65,7 @@ export function CommentPreview({
   return (
     <div>
       <button onClick={handleViewAllComments} className="hover:underline mt-2">
-         View All Comments
+        {showAllComments ? "Close Comments" : "View All Comments"}
       </button>
 
       {showAllComments && (
