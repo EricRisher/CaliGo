@@ -30,6 +30,7 @@ const allowedOrigins = [
   "http://localhost:3001",
   "http://localhost:3000",
   "http://192.168.1.37:3000",
+  "http://192.167.1.37:3001",
 ];
 app.use(
   cors({
@@ -46,6 +47,10 @@ app.use(cookieParser()); // Parses cookies
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
+
+app.get("/", (req, res) => {
+  res.send("Backend server is running!");
+});
 
 // Routes
 app.use(routes);
