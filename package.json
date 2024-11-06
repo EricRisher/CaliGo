@@ -12,6 +12,7 @@
     "npm": "10.x"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "docker": "^1.0.0"
   }
 }
