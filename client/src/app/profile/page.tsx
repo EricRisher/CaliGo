@@ -5,27 +5,66 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProtectedPage from "@/components/ProtectedPage";
 
-type Spot = {
-  id: number;
-  title: string;
-  image: string;
-};
-
-export default function ProfilePage() {
-  return (
-    <React.Suspense fallback={<div>Loading...</div>}>
-      <ProfileContent />
-    </React.Suspense>
-  );
+// Define interfaces for Spot, Comment, and User
+interface Comment {
+  commentText: string;
+  commentAuthor: {
+    username: string;
+  };
 }
 
-function ProfileContent() {
+interface User {
+  username: string;
+}
+
+interface Spot {
+  id: number;
+  spotName: string;
+  location: string;
+  description: string;
+  image: string;
+  User: User;
+  comments?: Comment[];
+  commentCount?: number;
+  likes: number;
+  userLiked: boolean;
+  updatedAt: string;
+  creator: User;
+}
+
+const GuestRedirectModal = ({ onClose }: { onClose: () => void }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <h2 className="text-xl font-semibold">Sign Up Required</h2>
+      <p className="text-sm">
+        To access full features like your profile and maps, please sign up for
+        an account.
+      </p>
+      <button
+        onClick={onClose}
+        className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
+      >
+        Close
+      </button>
+      <button
+        onClick={() => (window.location.href = "/signup")}
+        className="bg-green-500 text-white py-2 px-4 rounded mt-2"
+      >
+        Sign Up
+      </button>
+    </div>
+  </div>
+);
+
+export default function ProfilePage() {
   const [username, setUsername] = useState("Username");
   const [mySpots, setMySpots] = useState<Spot[]>([]);
   const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
+  const [isGuest, setIsGuest] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
@@ -52,13 +91,18 @@ function ProfileContent() {
         setMySpots(user.mySpots || []);
         setSavedSpots(user.savedSpots || []);
         setIsLoggedIn(true);
+        if (user.isGuest) {
+          setIsGuest(true);
+        }
       } else {
         console.error("Invalid token or session expired");
         setIsLoggedIn(false);
+        setIsGuest(true); // Treat as guest if no valid session
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
       setIsLoggedIn(false);
+      setIsGuest(true); // Treat as guest if there's an error
     }
   };
 
@@ -71,6 +115,7 @@ function ProfileContent() {
 
       if (response.ok) {
         setIsLoggedIn(false);
+        setIsGuest(true); // Set as guest after logout
         window.location.href = "/";
       } else {
         console.error("Failed to log out");
@@ -81,6 +126,23 @@ function ProfileContent() {
   };
 
   const getXpForNextLevel = (level: number): number => level * 100;
+
+  const handleAccessDenied = () => {
+    setShowModal(true);
+  };
+
+  if (isGuest) {
+    return (
+      <div>
+        <div className="content">
+          {/* Home feed or allowed content for guests */}
+        </div>
+        {showModal && (
+          <GuestRedirectModal onClose={() => setShowModal(false)} />
+        )}
+      </div>
+    );
+  }
 
   return (
     <ProtectedPage>
@@ -159,13 +221,15 @@ function ProfileContent() {
                   style={{ width: "100%", aspectRatio: "1 / 1" }}
                 >
                   <button onClick={() => router.push(`/spot/${spot.id}`)}>
-                    <Image
-                      src={`${apiUrl}${spot.image}`}
-                      alt={spot.title}
-                      width={128}
-                      height={128}
-                      className="rounded-md"
-                    />
+                    {spot.image && (
+                      <img
+                        src={spot.image}
+                        alt={spot.spotName}
+                        width={128}
+                        height={128}
+                        className="rounded-md"
+                      />
+                    )}
                   </button>
                 </div>
               ))}
@@ -175,7 +239,7 @@ function ProfileContent() {
                   key={spot.id}
                   className="bg-blue-300 rounded-md h-32 flex items-center justify-center"
                 >
-                  <p>{spot.title}</p>
+                  <p>{spot.spotName}</p>
                 </div>
               ))}
           </div>
@@ -185,9 +249,6 @@ function ProfileContent() {
         <div className="flex justify-around w-full bg-transparent p-4 mt-auto relative z-10">
           <a href="/credit" className="text-black hover:underline">
             Credit
-          </a>
-          <a href="/legal" className="text-black hover:underline">
-            Legal
           </a>
           <button onClick={handleLogout} className="text-black hover:underline">
             Log out

@@ -8,11 +8,10 @@ const userRoutes = require("./user");
 
 const router = express.Router();
 
-// Use the routes
-router.use("/auth", authRoutes); // Routes under /auth
-router.use("/comments", commentRoutes); // Routes for comments
-router.use("/spots", spotRoutes); // Routes for spots
-router.use("/users", userRoutes); // Routes for users
+// Use the routes under /api prefix
+router.use("/api/auth", authRoutes); // Routes under /api/auth
+router.use("/api/comments", commentRoutes); // Routes for comments
+router.use("/api/spots", spotRoutes); // Routes for spots
+router.use("/api/users", userRoutes); // Routes for users
 
-// Export the router
 module.exports = router;

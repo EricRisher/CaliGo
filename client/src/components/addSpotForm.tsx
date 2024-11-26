@@ -5,7 +5,7 @@ import { useState } from "react";
 export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const [spotName, setSpotName] = useState("");
   const [spotDescription, setSpotDescription] = useState("");
-  const [spotLocation, setSpotLocation] = useState("");
+  const [spotCoordinates, setSpotCoordinates] = useState(""); // Combined lat, long input
   const [image, setImage] = useState<File | null>(null);
 
   // Handle file input change
@@ -19,10 +19,30 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate location format: "latitude, longitude"
+    const coords = spotCoordinates
+      .split(",")
+      .map((coord: string) => coord.trim());
+    if (
+      coords.length !== 2 ||
+      isNaN(Number(coords[0])) ||
+      isNaN(Number(coords[1]))
+    ) {
+      alert("Please enter location in 'latitude, longitude' format.");
+      return;
+    }
+
+    // Parse the coordinates to numbers
+    const latitude = parseFloat(coords[0]);
+    const longitude = parseFloat(coords[1]);
+    const location = `${latitude}, ${longitude}`; // Concatenate to form location string
+
     const formData = new FormData();
     formData.append("spotName", spotName);
     formData.append("description", spotDescription);
-    formData.append("location", spotLocation);
+    formData.append("latitude", latitude.toString());
+    formData.append("longitude", longitude.toString());
+    formData.append("location", location);
     if (image) {
       formData.append("image", image);
     }
@@ -51,7 +71,6 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
     }
   };
 
-
   return (
     <div className="max-w-lg mx-auto">
       <div className="flex align-middle">
@@ -79,7 +98,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
             className="border border-gray-300 rounded w-full py-2 px-3"
             required
             value={spotName}
-            onChange={(e) => setSpotName(e.target.value)} // Update state on input change
+            onChange={(e) => setSpotName(e.target.value)}
           />
         </div>
         <div>
@@ -91,19 +110,20 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
             className="border border-gray-300 rounded w-full py-2 px-3"
             required
             value={spotDescription}
-            onChange={(e) => setSpotDescription(e.target.value)} // Update state on input change
+            onChange={(e) => setSpotDescription(e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="spotLocation">Location:</label>
+          <label htmlFor="spotCoordinates">Coordinates (lat, long):</label>
           <input
             type="text"
-            id="spotLocation"
-            name="spotLocation"
+            id="spotCoordinates"
+            name="spotCoordinates"
+            placeholder="e.g., 33.831502576841494, -117.5948548592334"
             className="border border-gray-300 rounded w-full py-2 px-3"
             required
-            value={spotLocation}
-            onChange={(e) => setSpotLocation(e.target.value)} // Update state on input change
+            value={spotCoordinates}
+            onChange={(e) => setSpotCoordinates(e.target.value)}
           />
         </div>
         <div>
@@ -113,7 +133,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
             id="image"
             name="image"
             className="border border-gray-300 rounded w-full py-2 px-3"
-            onChange={(e) => setImage(e.target.files?.[0] || null)} // Update state with the selected file
+            onChange={handleImageChange}
           />
         </div>
         <button

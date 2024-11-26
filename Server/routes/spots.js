@@ -7,42 +7,67 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Create the upload path if it doesn't exist
-const uploadPath = path.join(__dirname, "..", "public", "uploads");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
+// Set the base upload directory on the server-side
+const baseUploadPath = path.join(__dirname, "../uploads");
+console.log("Base Upload Path:", baseUploadPath);
+
+if (!fs.existsSync(baseUploadPath)) {
+  fs.mkdirSync(baseUploadPath, { recursive: true });
 }
 
 // Multer storage setup for image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log("Upload path:", uploadPath); // Debugging
-    cb(null, uploadPath); // Ensure the path exists
+    const userUploadPath = path.join(baseUploadPath, req.user.id.toString()); // Create user-specific folder
+    if (!fs.existsSync(userUploadPath)) {
+      fs.mkdirSync(userUploadPath, { recursive: true });
+    }
+    cb(null, userUploadPath); // Save to user-specific folder
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname); // Unique filename
   },
 });
+
 const upload = multer({ storage });
 
 // Create a new spot (Protected Route)
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
-    const { spotName, description, location, latitude, longitude } = req.body;
+    const { spotName, description, location } = req.body;
 
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    // Ensure location exists and split into latitude and longitude
+    if (!location) {
+      return res.status(400).json({
+        message:
+          "Location is required and should be in 'latitude, longitude' format.",
+      });
+    }
 
-    // Access userId from req.user (assuming authenticateToken sets it correctly)
-    const userId = req.user.id;
+    const [latitude, longitude] = location
+      .split(",")
+      .map((coord) => parseFloat(coord.trim()));
 
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({
+        message: "Invalid coordinates format. Use 'latitude, longitude'.",
+      });
+    }
+
+    // Generate the relative path for the image (e.g., /uploads/userId/image.jpg)
+    const imagePath = req.file
+      ? `/uploads/${req.user.id}/${req.file.filename}`
+      : null;
+
+    // Create the new spot
     const newSpot = await Spot.create({
       spotName,
       description,
       location,
-      latitude, // Store latitude
-      longitude, // Store longitude
+      latitude,
+      longitude,
       image: imagePath,
-      userId, // Set userId here
+      userId: req.user.id, // Authenticated user ID
     });
 
     res.status(201).json(newSpot);
@@ -51,7 +76,6 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
     res.status(500).json({ message: "Failed to add the spot" });
   }
 });
-
 
 // Get all spots
 router.get("/", async (req, res) => {
@@ -209,7 +233,9 @@ router.delete("/:spotId/unlike", authMiddleware, async (req, res) => {
     spot.likes = Math.max(0, (spot.likes || 0) - 1);
     await spot.save();
 
-    res.status(200).json({ message: "Spot unliked successfully", likes: spot.likes });
+    res
+      .status(200)
+      .json({ message: "Spot unliked successfully", likes: spot.likes });
   } catch (error) {
     console.error("Error unliking post:", error);
     res.status(500).json({ error: error.message });

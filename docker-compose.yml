@@ -11,14 +11,16 @@ services:
       - .env  # Use .env for environment variables
     depends_on:
       - backend
+    volumes:
+      - ./client/public:/app/public  # Map the frontend public folder for static assets
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: caligo_db
+      MYSQL_ROOT_PASSWORD: eric
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql  # Persistent storage for MySQL database
     ports:
       - "3307:3306"
 
@@ -30,8 +32,10 @@ services:
       - "3001:3001"
     env_file:
       - .env  # Use .env for environment variables
+    volumes:
+      - ./Server/uploads:/app/uploads  # Persistent storage for uploaded images in backend
     depends_on:
       - mysql
 
 volumes:
-  mysql_data:
+  mysql_data:  # Persistent storage for MySQL data

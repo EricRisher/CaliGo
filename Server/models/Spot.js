@@ -26,12 +26,8 @@ Spot.init(
         len: [1, 300],
       },
     },
-    location: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     latitude: {
-      type: DataTypes.FLOAT, // Add latitude as FLOAT
+      type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
         min: -90,
@@ -39,7 +35,7 @@ Spot.init(
       },
     },
     longitude: {
-      type: DataTypes.FLOAT, // Add longitude as FLOAT
+      type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
         min: -180,

@@ -15,7 +15,16 @@ const nextConfig = {
         port: "3001",
         pathname: "/uploads/**",
       },
-      // Include other patterns if needed
+      {
+        protocol: "https",
+        hostname: "caligo.site",
+        pathname: "**", // Match all routes
+      },
+      {
+        protocol: "http",
+        hostname: "caligo.site",
+        pathname: "**", // Match all routes
+      },
       {
         protocol: "https",
         hostname: "mtek3d.com",

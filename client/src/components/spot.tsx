@@ -42,14 +42,13 @@ export function Spots({ spotId }: { spotId?: string }) {
     {}
   );
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Use the environment variable
   const userId = 1; // Example user ID, replace with actual logged-in user ID
 
   useEffect(() => {
     const fetchSpots = async () => {
       try {
         const response = await fetch(
-          spotId ? `${apiUrl}/spots/${spotId}` : `${apiUrl}/spots`
+          spotId ? `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}` : `${process.env.NEXT_PUBLIC_API_URL}/spots`
         );
         const data = await response.json();
         const spotArray = spotId ? [data] : data;
@@ -72,11 +71,11 @@ export function Spots({ spotId }: { spotId?: string }) {
     };
 
     fetchSpots();
-  }, [spotId, apiUrl]);
+  }, [spotId]);
 
   const fetchComments = async (spotId: number) => {
     try {
-      const response = await fetch(`${apiUrl}/comments/${spotId}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/${spotId}`);
       const comments = await response.json();
       setCommentsData((prev) => ({
         ...prev,
@@ -89,7 +88,9 @@ export function Spots({ spotId }: { spotId?: string }) {
 
   const toggleLike = async (spotId: number) => {
     const isLiked = likedPosts[spotId];
-    const url = `${apiUrl}/spots/${spotId}/${isLiked ? "unlike" : "like"}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}/${
+      isLiked ? "unlike" : "like"
+    }`;
 
     try {
       const response = await fetch(url, {
@@ -150,8 +151,8 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div className="bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
-              <Image
-                src={`${apiUrl}${spot.image}`}
+              <img
+                src={spot.image}
                 alt={spot.spotName}
                 width={500}
                 height={500}
@@ -211,7 +212,9 @@ export function Spots({ spotId }: { spotId?: string }) {
               })) || []
             }
             onFetchComments={async () => {
-              const response = await fetch(`${apiUrl}/comments/${spot.id}`);
+              const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/comments/${spot.id}`
+              );
               const fetchedComments = await response.json();
               return Array.isArray(fetchedComments)
                 ? fetchedComments.map((comment: Comment) => ({
@@ -222,7 +225,7 @@ export function Spots({ spotId }: { spotId?: string }) {
             }}
             spotId={spot.id}
           />
-          <div className="mt-1 font-normal">
+          <div className="mt-1 font-normal text-right">
             {new Date(spot.updatedAt).toLocaleDateString()}
           </div>
         </div>

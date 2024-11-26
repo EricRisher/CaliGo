@@ -1,12 +1,14 @@
 Checklist:
+- Login as Guest
+- Donation button
+- Make map points show real db data
+- Add user profile pics, and a bio. Must have to engage with community.
+- Make xp leveling up work per user post/comment; +1xp per comment, +10xp per spot, +1xp per total spot likes
+- Add saved posts functionality
+- Update spots to take up entire width of page, force fullscreen for mobile users.
 - Add login with google button
 - Add forgot password functionality
-- Make working spot upload feature
-- Add user profiles
-- Add saved posts functionality
-- Make xp leveling up work per user post/comment
 - Add notifications
-- Make map points show real db data
 - Implement search and filter
 - Dark mode?
 

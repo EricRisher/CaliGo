@@ -21,7 +21,6 @@ export const metadata: Metadata = {
     icon: "/favicon-32x32.png",
     shortcut: "/favicon-16x16.png",
   },
-  themeColor: "#ffffff",
   viewport: {
     width: "device-width",
     initialScale: 1,

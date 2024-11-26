@@ -11,22 +11,39 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
- const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-   e.preventDefault();
-   try {
-     setError(null);
-     const response = await axios.post(
-       `${process.env.NEXT_PUBLIC_API_URL}/auth/login`, // Dynamic URL
-       { username, password },
-       { withCredentials: true } // Enables cookies
-     );
-     if (response.status === 200) {
-       router.push("/home"); // Redirect to home on success
-     }
-   } catch (err) {
-     setError("Invalid username or password. Please try again.");
-   }
- };
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setError(null);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`, // Dynamic URL
+        { username, password },
+        { withCredentials: true } // Enables cookies
+      );
+      if (response.status === 200) {
+        router.push("/home"); // Redirect to home on success
+      }
+    } catch (err) {
+      setError("Invalid username or password. Please try again.");
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      setError(null);
+      // Call the backend endpoint for guest login
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/guest-login`, // Dynamic URL for guest login
+        {},
+        { withCredentials: true } // Enables cookies
+      );
+      if (response.status === 200) {
+        router.push("/home"); // Redirect to home on success
+      }
+    } catch (err) {
+      setError("Error logging in as guest. Please try again.");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -65,6 +82,13 @@ export default function LoginPage() {
             className="bg-blue-500 text-white py-2 rounded mt-2"
           >
             Login
+          </button>
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            className="bg-green-500 text-white py-2 rounded mt-2"
+          >
+            Login as Guest
           </button>
           <p className="text-sm mt-2">
             New Here?{" "}

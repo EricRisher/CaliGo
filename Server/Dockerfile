@@ -2,16 +2,16 @@
 FROM node:18-alpine
 
 # Install dependencies for bcrypt on Alpine
-RUN apk add --no-cache python3 make g++ 
+RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
 
 COPY . .
 
+# Expose the backend port
 EXPOSE 3001
 
 # Wait for MySQL to be available, then start the server

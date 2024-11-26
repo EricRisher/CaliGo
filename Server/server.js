@@ -29,7 +29,7 @@ const allowedOrigins = [
   "http://localhost:3001",
   "http://localhost:3000",
   "http://192.168.1.37:3000",
-  "http://192.167.1.37:3001",
+  "http://192.168.1.37:3001",
   "http://caligo.site",
   "https://caligo.site",
   "http://www.caligo.site",
@@ -62,7 +62,7 @@ app.use(cookieParser());
 
 // Static asset serving
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Health check route
 app.get("/", (req, res) => {
