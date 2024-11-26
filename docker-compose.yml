@@ -7,33 +7,31 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://backend:3001/
+    env_file:
+      - .env  # Use .env for environment variables
     depends_on:
       - backend
-
-  backend:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: eric  # Replace with actual password
-      DB_NAME: caligo_db
-      DB_PORT: 3306
-    depends_on:
-      - mysql
-    command: /bin/sh -c "while ! nc -z mysql 3306; do sleep 3; done; node server.js"  # Wait until MySQL is available
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: eric
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
     ports:
       - "3307:3306"
+
+  backend:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env  # Use .env for environment variables
+    depends_on:
+      - mysql
 
 volumes:
   mysql_data:
