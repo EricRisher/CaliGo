@@ -4,6 +4,15 @@ import "leaflet/dist/leaflet.css";
 import { useState } from "react";
 import Image from "next/image";
 
+// Define the Spot interface to match the shape passed from MapPage
+interface Spot {
+  id: number;
+  spotName: string;
+  latitude: number;
+  longitude: number;
+  image: string;
+}
+
 // Custom marker icon
 const markerIcon = new L.Icon({
   iconUrl: "/icons/pin.png",
@@ -12,19 +21,6 @@ const markerIcon = new L.Icon({
   popupAnchor: [1, -34],
 });
 
-const spots = [
-  { id: 1, name: "Kagel Canyon", coordinates: [34.3079, -118.3453] },
-  { id: 2, name: "Hidden Springs", coordinates: [34.3202, -118.3174] },
-  {
-    id: 3,
-    name: "Los Angeles National Forest",
-    coordinates: [34.2498, -118.2075],
-  },
-  { id: 4, name: "Long Beach", coordinates: [33.7701, -118.1937] },
-  // Add more spots as needed
-];
-
-// Button to find and show user location on the map
 function LocateButton({
   setUserLocation,
 }: {
@@ -63,13 +59,13 @@ function LocateButton({
   );
 }
 
-export default function CustomMap({}) {
+export default function CustomMap({ spots }: { spots: Spot[] }) {
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null);
 
   return (
     <div className="relative z-10">
       <MapContainer
-        center={[34.0522, -118.2437]}
+        center={[34.0522, -118.2437]} // Default center
         zoom={10}
         style={{ height: "100vh", width: "100%" }}
       >
@@ -80,11 +76,11 @@ export default function CustomMap({}) {
         {spots.map((spot) => (
           <Marker
             key={spot.id}
-            position={spot.coordinates as [number, number]}
+            position={[spot.latitude, spot.longitude]}
             icon={markerIcon}
           >
             <Popup>
-              <a href={`/spot/${spot.id}`}>{spot.name}</a>
+              <a href={`/spot/${spot.id}`}>{spot.spotName}</a>
             </Popup>
           </Marker>
         ))}
