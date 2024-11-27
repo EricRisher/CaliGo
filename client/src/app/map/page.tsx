@@ -39,7 +39,7 @@ export default function MapPage() {
   }, [pathname]);
 
   return (
-    <ProtectedPage>
+   // <ProtectedPage>
       <div className="relative">
         <Header />
         <CustomMap />
@@ -55,6 +55,6 @@ export default function MapPage() {
 
         <Navigation />
       </div>
-    </ProtectedPage>
+   // </ProtectedPage>
   );
 }

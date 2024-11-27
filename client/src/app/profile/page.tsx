@@ -32,39 +32,21 @@ interface Spot {
   creator: User;
 }
 
-const GuestRedirectModal = ({ onClose }: { onClose: () => void }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold">Sign Up Required</h2>
-      <p className="text-sm">
-        To access full features like your profile and maps, please sign up for
-        an account.
-      </p>
-      <button
-        onClick={onClose}
-        className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
-      >
-        Close
-      </button>
-      <button
-        onClick={() => (window.location.href = "/signup")}
-        className="bg-green-500 text-white py-2 px-4 rounded mt-2"
-      >
-        Sign Up
-      </button>
-    </div>
-  </div>
-);
-
 export default function ProfilePage() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <ProfileContent />
+    </React.Suspense>
+  );
+}
+
+function ProfileContent() {
   const [username, setUsername] = useState("Username");
   const [mySpots, setMySpots] = useState<Spot[]>([]);
   const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
-  const [isGuest, setIsGuest] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
@@ -91,18 +73,13 @@ export default function ProfilePage() {
         setMySpots(user.mySpots || []);
         setSavedSpots(user.savedSpots || []);
         setIsLoggedIn(true);
-        if (user.isGuest) {
-          setIsGuest(true);
-        }
       } else {
         console.error("Invalid token or session expired");
         setIsLoggedIn(false);
-        setIsGuest(true); // Treat as guest if no valid session
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
       setIsLoggedIn(false);
-      setIsGuest(true); // Treat as guest if there's an error
     }
   };
 
@@ -115,7 +92,6 @@ export default function ProfilePage() {
 
       if (response.ok) {
         setIsLoggedIn(false);
-        setIsGuest(true); // Set as guest after logout
         window.location.href = "/";
       } else {
         console.error("Failed to log out");
@@ -127,25 +103,8 @@ export default function ProfilePage() {
 
   const getXpForNextLevel = (level: number): number => level * 100;
 
-  const handleAccessDenied = () => {
-    setShowModal(true);
-  };
-
-  if (isGuest) {
-    return (
-      <div>
-        <div className="content">
-          {/* Home feed or allowed content for guests */}
-        </div>
-        {showModal && (
-          <GuestRedirectModal onClose={() => setShowModal(false)} />
-        )}
-      </div>
-    );
-  }
-
   return (
-    <ProtectedPage>
+  //  <ProtectedPage>
       <div className="relative flex flex-col min-h-screen bg-primary">
         {/* Profile Header */}
         <div className="relative w-full p-4 flex justify-between items-center z-10">
@@ -247,14 +206,23 @@ export default function ProfilePage() {
 
         {/* Footer with Log Out Option */}
         <div className="flex justify-around w-full bg-transparent p-4 mt-auto relative z-10">
+          <a
+            href="https://www.paypal.com/donate/?business=TZ8JDDGWGDFY8&no_recurring=0&item_name=Your+donation+will+directly+support+me+in+solo-developing+this+app+as+well+as+many+more+projects+for+the+people.+Thank+you&currency_code=USD"
+            className="text-black hover:underline"
+          >
+            Donate
+          </a>
           <a href="/credit" className="text-black hover:underline">
             Credit
+          </a>
+          <a href="/legal" className="text-black hover:underline">
+            Legal
           </a>
           <button onClick={handleLogout} className="text-black hover:underline">
             Log out
           </button>
         </div>
       </div>
-    </ProtectedPage>
+ //   </ProtectedPage>
   );
 }

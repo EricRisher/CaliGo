@@ -10,8 +10,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col ">
-      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center">
+    <div className="flex flex-col min-h-screen">
+      {" "}
+      {/* Set min-height of screen */}
+      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center min-h-screen">
+        {" "}
+        {/* Set min-height of screen */}
         <Image
           src="/icons/icon-trans.png"
           alt="CaliGo"
@@ -19,7 +23,7 @@ export default function Home() {
           height={200}
           className="logo"
         />
-        <section className="max-w-lg mb-12">
+        <section className="max-w-90 mb-5">
           <h1 className="mb-4">Discover the West Coast like never before!</h1>
           <p className="mb-6">
             You’re about to embark on a journey to uncover hidden gems and
@@ -38,7 +42,7 @@ export default function Home() {
             href="https://github.com/EricRisher/CaliGo"
             className=" hover:underline"
           >
-            v2.2.6
+            v2.4.1
           </a>
           <a href="https://www.ericrisher.com" className=" hover:underline">
             by <b>Eric Risher</b>

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { generateToken } = require("../utils/token");
 const { User, Spot } = require("../models");
 const authenticateToken = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -45,7 +46,7 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token and set it as a cookie
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "30d",
     });
     res
       .cookie("token", token, { httpOnly: true })
@@ -55,6 +56,24 @@ router.post("/login", async (req, res) => {
     console.error("Login Error:", error);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+router.post("/guest-login", (req, res) => {
+  const guestUser = {
+    id: "guest-" + Date.now(), // Unique guest user ID
+    username: "Guest-" + Date.now(), // Unique username for the guest
+    isGuest: true,
+  };
+
+  // Set up a session or JWT token for the guest
+  const token = generateToken(guestUser); // Replace with your token generation logic
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Set secure cookies in production
+  });
+
+  res.status(200).json({ message: "Guest login successful" });
 });
 
 router.get("/profile", authenticateToken, async (req, res) => {

@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center">
+      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center text-center">
         <Image
           src="/icons/icon-trans.png"
           alt="CaliGo"
@@ -86,7 +86,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGuestLogin}
-            className="bg-green-500 text-white py-2 rounded mt-2"
+            className="bg-orange-400 text-white py-2 rounded mt-2"
           >
             Login as Guest
           </button>

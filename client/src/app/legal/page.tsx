@@ -12,7 +12,7 @@ function page() {
         </button>
 
       </div>
-      <div className="m-10 text-2xl">
+      <div className="m-8 text-2xl">
         The information provided by the CaliGo app is for general informational
         purposes only. All information on the app is provided in good faith,
         however, we make no representation or warranty of any kind, express or
