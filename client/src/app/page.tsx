@@ -21,7 +21,7 @@ export default function Home() {
           alt="CaliGo"
           width={200}
           height={200}
-          className="logo"
+          className="mt-4"
         />
         <section className="max-w-90 m-4">
           <h1 className="mb-4">Discover the West Coast like never before!</h1>
