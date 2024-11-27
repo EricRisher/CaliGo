@@ -17,6 +17,7 @@ node_modules
 /build
 
 # misc
+**/uploads/
 .DS_Store
 *.pem
 
