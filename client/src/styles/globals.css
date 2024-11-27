@@ -181,11 +181,6 @@ button {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(195, 212, 255, 0.7);
 }
 
-.logo {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 .header,
 .navbar {
   z-index: 100;

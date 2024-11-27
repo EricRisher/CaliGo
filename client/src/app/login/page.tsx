@@ -53,13 +53,12 @@ export default function LoginPage() {
           alt="CaliGo"
           width={200}
           height={200}
-          className="logo"
+          className="mt-4"
         />
         <form
           onSubmit={handleLogin}
           className="flex flex-col gap-4 w-80 mt-8 p-4 bg-white rounded-lg shadow-lg"
         >
-          <h2 className="text-xl font-semibold">Login to CaliGo</h2>
           {error && <p className="text-red-500">{error}</p>}
           <input
             type="text"
@@ -81,14 +80,14 @@ export default function LoginPage() {
             type="submit"
             className="bg-blue-500 text-white py-2 rounded mt-2"
           >
-            Login
+            Log in
           </button>
           <button
             type="button"
             onClick={handleGuestLogin}
             className="bg-orange-400 text-white py-2 rounded mt-2"
           >
-            Login as Guest
+            Log in as Guest
           </button>
           <p className="text-sm mt-2">
             New Here?{" "}

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React from "react";
 import Image from "next/image";
@@ -6,13 +6,7 @@ import Image from "next/image";
 function page() {
   return (
     <>
-      <div className="relative w-full p-4 flex justify-between items-center z-10">
-        <button onClick={() => (window.location.href = "/profile")}>
-          <Image src="/icons/close.png" alt="Close" width={32} height={32} />
-        </button>
-
-      </div>
-      <div className="m-8 text-2xl">
+      <div className="m-4 mt-0 text-l text-justify">
         The information provided by the CaliGo app is for general informational
         purposes only. All information on the app is provided in good faith,
         however, we make no representation or warranty of any kind, express or
@@ -27,7 +21,14 @@ function page() {
         app or reliance on any information provided by the app. Users are
         encouraged to respect property rights and personal safety at all times.
       </div>
-      <h2 className="m-10 pt-5 text-center">WE ARE NOT RESPONSIBLE FOR YOUR ACTIONS, PROCEED AT YOUR OWN RISKS</h2>
+      <h2 className="m-10 text-center">
+        WE ARE NOT RESPONSIBLE FOR YOUR ACTIONS, PROCEED AT YOUR OWN RISKS
+      </h2>
+      <div className="relative w-full p-4 flex justify-between items-center z-10">
+        <button onClick={() => (window.location.href = "/profile")}>
+          <Image src="/icons/close.png" alt="Close" width={32} height={32} />
+        </button>
+      </div>
     </>
   );
 }

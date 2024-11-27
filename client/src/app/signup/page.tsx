@@ -31,19 +31,18 @@ const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center">
+      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center text-center">
         <Image
           src="/icons/icon-trans.png"
           alt="CaliGo"
           width={200}
           height={200}
-          className="logo"
+          className="mt-4"
         />
         <form
           onSubmit={handleSignup}
           className="flex flex-col gap-4 w-80 mt-8 p-4 bg-white rounded-lg shadow-lg"
         >
-          <h2 className="text-xl font-semibold">Create an Account</h2>
           {error && <p className="text-red-500">{error}</p>}
           <input
             type="email"
@@ -69,6 +68,7 @@ const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 rounded mt-2"
@@ -78,7 +78,7 @@ const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
           <p className="text-sm mt-2">
             Been Here Before?{" "}
             <a href="/login" className="text-blue-600">
-              Login
+              Log in
             </a>
           </p>
         </form>
