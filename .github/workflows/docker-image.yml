@@ -14,54 +14,63 @@ jobs:
       HOME_SERVER_USER: ${{ secrets.HOME_SERVER_USER }}
 
     steps:
-      # Checkout the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    # Step 1: Checkout repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      # Set up SSH for server access
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.HOME_SERVER_SSH_KEY }}
+    # Step 2: Setup Docker
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      # Build the Docker images
-      - name: Build Backend Docker Image
-        run: |
-          docker build -t backend-image ./Server
+    # Step 3: Build Frontend Docker Image
+    - name: Build Frontend Docker Image
+      run: |
+        docker build ./client \
+          --file ./client/Dockerfile \
+          --tag frontend:latest
 
-      - name: Build Frontend Docker Image
-        run: |
-          docker build -t frontend-image ./client
+    # Step 4: Build Backend Docker Image
+    - name: Build Backend Docker Image
+      run: |
+        docker build ./server \
+          --file ./server/Dockerfile \
+          --tag backend:latest
 
-      # Save Docker images as tar files for transfer
-      - name: Save Backend Image
-        run: |
-          docker save backend-image | gzip > backend-image.tar.gz
+    # Step 5: Transfer Docker Images to Server
+    - name: Save Frontend Image to Tarball
+      run: docker save frontend:latest -o frontend.tar
 
-      - name: Save Frontend Image
-        run: |
-          docker save frontend-image | gzip > frontend-image.tar.gz
+    - name: Save Backend Image to Tarball
+      run: docker save backend:latest -o backend.tar
 
-      # Transfer Docker images to the server
-      - name: Transfer Backend Image
-        run: |
-          scp backend-image.tar.gz ${{ env.HOME_SERVER_USER }}@${{ env.HOME_SERVER_IP }}:~/backend-image.tar.gz
+    - name: Copy Frontend Image to Server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOME_SERVER_IP }}
+        username: ${{ secrets.HOME_SERVER_USER }}
+        key: ${{ secrets.HOME_SERVER_SSH_KEY }}
+        source: frontend.tar
+        target: ~/my-app/frontend.tar
 
-      - name: Transfer Frontend Image
-        run: |
-          scp frontend-image.tar.gz ${{ env.HOME_SERVER_USER }}@${{ env.HOME_SERVER_IP }}:~/frontend-image.tar.gz
+    - name: Copy Backend Image to Server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOME_SERVER_IP }}
+        username: ${{ secrets.HOME_SERVER_USER }}
+        key: ${{ secrets.HOME_SERVER_SSH_KEY }}
+        source: backend.tar
+        target: ~/my-app/backend.tar
 
-      # Deploy on the server
-      - name: Deploy to Server
-        run: |
-          ssh ${{ env.HOME_SERVER_USER }}@${{ env.HOME_SERVER_IP }} << EOF
-          # Load Docker images on the server
-          docker load < ~/backend-image.tar.gz
-          docker load < ~/frontend-image.tar.gz
-
-          # Remove existing containers but keep volumes
-          docker-compose down --remove-orphans
-
-          # Start the updated application
-          docker-compose up -d --build
-          EOF
+    # Step 6: Load Docker Images and Deploy
+    - name: Deploy to Home Server
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.HOME_SERVER_IP }}
+        username: ${{ secrets.HOME_SERVER_USER }}
+        key: ${{ secrets.HOME_SERVER_SSH_KEY }}
+        script: |
+          cd ~/my-app
+          docker load < frontend.tar
+          docker load < backend.tar
+          docker-compose -f docker-compose.yml -f docker-compose.override.prod.yml down
+          docker-compose -f docker-compose.yml -f docker-compose.override.prod.yml up -d
