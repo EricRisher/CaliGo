@@ -32,7 +32,7 @@ jobs:
     - name: Build Backend Docker Image
       run: |
         docker build ./Server \
-          --file ./server/Dockerfile \
+          --file ./Server/Dockerfile \
           --tag backend:latest
 
     # Step 5: Transfer Docker Images to Server
