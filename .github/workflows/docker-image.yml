@@ -35,13 +35,14 @@ jobs:
           --file ./Server/Dockerfile \
           --tag backend:latest
 
-    # Step 5: Transfer Docker Images to Server
+    # Step 5: Save Docker Images to Tarballs
     - name: Save Frontend Image to Tarball
       run: docker save frontend:latest -o frontend.tar
 
     - name: Save Backend Image to Tarball
       run: docker save backend:latest -o backend.tar
 
+    # Step 6: Transfer Docker Images to Server
     - name: Copy Frontend Image to Server
       uses: appleboy/scp-action@v0.1.4
       with:
@@ -49,7 +50,7 @@ jobs:
         username: ${{ secrets.HOME_SERVER_USER }}
         key: ${{ secrets.HOME_SERVER_SSH_KEY }}
         source: frontend.tar
-        target: ~/my-app/frontend.tar
+        target: /tmp/frontend.tar
 
     - name: Copy Backend Image to Server
       uses: appleboy/scp-action@v0.1.4
@@ -58,9 +59,9 @@ jobs:
         username: ${{ secrets.HOME_SERVER_USER }}
         key: ${{ secrets.HOME_SERVER_SSH_KEY }}
         source: backend.tar
-        target: ~/my-app/backend.tar
+        target: /tmp/backend.tar
 
-    # Step 6: Load Docker Images and Deploy
+    # Step 7: Load Docker Images and Deploy
     - name: Deploy to Home Server
       uses: appleboy/ssh-action@v0.1.4
       with:
@@ -68,8 +69,11 @@ jobs:
         username: ${{ secrets.HOME_SERVER_USER }}
         key: ${{ secrets.HOME_SERVER_SSH_KEY }}
         script: |
+          sudo systemctl start docker
           cd ~/my-app
-          docker load < frontend.tar
-          docker load < backend.tar
+          docker load < /tmp/frontend.tar
+          docker load < /tmp/backend.tar
           docker-compose -f docker-compose.yml -f docker-compose.override.prod.yml down
+          docker image prune -f
           docker-compose -f docker-compose.yml -f docker-compose.override.prod.yml up -d
+          docker-compose logs
