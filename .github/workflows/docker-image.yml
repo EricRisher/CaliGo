@@ -31,7 +31,7 @@ jobs:
     # Step 4: Build Backend Docker Image
     - name: Build Backend Docker Image
       run: |
-        docker build ./server \
+        docker build ./Server \
           --file ./server/Dockerfile \
           --tag backend:latest
 
