@@ -37,6 +37,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3557904270288318"
+          crossOrigin="anonymous"
+        ></script>
         <meta name="msapplication-TileColor" content="#2b5797" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

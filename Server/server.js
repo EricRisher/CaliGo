@@ -34,6 +34,7 @@ const allowedOrigins = [
   "https://caligo.site",
   "http://www.caligo.site",
   "https://www.caligo.site",
+  "https://pagead2.googlesyndication.com",
 ];
 
 app.use(
