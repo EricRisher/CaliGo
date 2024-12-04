@@ -1,10 +1,7 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { useState } from "react";
-import Image from "next/image";
+"use client";
 
-// Define the Spot interface to match the shape passed from MapPage
+import { useEffect, useRef, useState } from "react";
+
 interface Spot {
   id: number;
   spotName: string;
@@ -13,29 +10,101 @@ interface Spot {
   image: string;
 }
 
-// Custom marker icon
-const markerIcon = new L.Icon({
-  iconUrl: "/icons/pin.png",
-  iconSize: [32, 32],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-});
+export default function CustomMap({ spots }: { spots: Spot[] }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
 
-function LocateButton({
-  setUserLocation,
-}: {
-  setUserLocation: (latlng: L.LatLng) => void;
-}) {
-  const map = useMap();
+  useEffect(() => {
+    if (mapRef.current && !map) {
+      const mapStyle = [
+        {
+          featureType: "administrative",
+          elementType: "geometry",
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
+        },
+        {
+          featureType: "poi",
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
+        },
+        {
+          featureType: "road",
+          elementType: "labels.icon",
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
+        },
+        {
+          featureType: "transit",
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
+        },
+      ];
 
-  const handleClick = () => {
+      const newMap = new google.maps.Map(mapRef.current, {
+        center: { lat: 34.0522, lng: -118.2437 },
+        zoom: 10,
+        mapTypeId: "hybrid",
+        styles: mapStyle, // Apply the custom style here
+      });
+      setMap(newMap);
+    }
+  }, [map]);
+
+  // Add Spots to Map
+  useEffect(() => {
+    if (map) {
+      spots.forEach((spot) => {
+        const marker = new google.maps.Marker({
+          position: { lat: spot.latitude, lng: spot.longitude },
+          map: map,
+          title: spot.spotName,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<a href="/spot/${spot.id}">${spot.spotName}</a>`,
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+  }, [map, spots]);
+
+  // Locate User and Add Marker
+  const handleLocateUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          const userLatLng = new L.LatLng(latitude, longitude);
-          map.setView(userLatLng, 13); // Adjust zoom level as needed
-          setUserLocation(userLatLng);
+          const userLatLng = new google.maps.LatLng(latitude, longitude);
+          map?.setCenter(userLatLng);
+          map?.setZoom(13);
+
+          if (userMarker) {
+            userMarker.setPosition(userLatLng);
+          } else {
+            const newMarker = new google.maps.Marker({
+              position: userLatLng,
+              map: map,
+              title: "You are here",
+            });
+            setUserMarker(newMarker);
+          }
         },
         () => {
           alert("Unable to retrieve your location");
@@ -47,50 +116,31 @@ function LocateButton({
   };
 
   return (
-    <button onClick={handleClick} className="absolute bottom-5 left-4 z-5 ">
-      <Image
-        src="/icons/mylocation.png"
-        alt="Find Location"
-        width={32}
-        height={32}
-        className="block z-1000"
-      />
-    </button>
-  );
-}
-
-export default function CustomMap({ spots }: { spots: Spot[] }) {
-  const [userLocation, setUserLocation] = useState<L.LatLng | null>(null);
-
-  return (
-    <div className="relative z-10">
-      <MapContainer
-        center={[34.0522, -118.2437]} // Default center
-        zoom={10}
-        style={{ height: "100vh", width: "100%" }}
+    <div style={{ position: "relative" }}>
+      <div
+        ref={mapRef}
+        style={{ height: "91vh", width: "100%", position: "absolute" }}
+      ></div>
+      <button
+        onClick={handleLocateUser}
+        style={{
+          position: "relative",
+          bottom: "-77vh",
+          left: "10px",
+          zIndex: 100,
+          backgroundColor: "white",
+          padding: "10px",
+          borderRadius: "50%",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+        }}
       >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        <img
+          src="/icons/mylocation.png"
+          alt="Locate Me"
+          width={32}
+          height={32}
         />
-        {spots.map((spot) => (
-          <Marker
-            key={spot.id}
-            position={[spot.latitude, spot.longitude]}
-            icon={markerIcon}
-          >
-            <Popup>
-              <a href={`/spot/${spot.id}`}>{spot.spotName}</a>
-            </Popup>
-          </Marker>
-        ))}
-        {userLocation && (
-          <Marker position={userLocation} icon={markerIcon}>
-            <Popup>You are here</Popup>
-          </Marker>
-        )}
-        <LocateButton setUserLocation={setUserLocation} />
-      </MapContainer>
+      </button>
     </div>
   );
 }

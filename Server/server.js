@@ -35,6 +35,7 @@ const allowedOrigins = [
   "http://www.caligo.site",
   "https://www.caligo.site",
   "https://pagead2.googlesyndication.com",
+  "https://maps.googleapis.com",
 ];
 
 app.use(
