@@ -56,8 +56,8 @@ export default function Home() {
     }
   };
 
-  const login = () => {
-    window.location.href = "/login";
+  const signup = () => {
+    window.location.href = "/signup";
   };
 
   return (
@@ -79,7 +79,7 @@ export default function Home() {
             explore breathtaking spots with a community of like-minded
             explorers.
           </p>
-          <Button onClick={login}>
+          <Button onClick={signup}>
             Join the Adventure <ArrowCircleRightOutlinedIcon />
           </Button>
 

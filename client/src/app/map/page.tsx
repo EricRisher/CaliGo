@@ -64,6 +64,9 @@ export default function MapPage() {
     }
   }, [pathname]);
 
+  // Determine the navbar background based on the route
+  const navBackground = pathname === "/map" ? "bg-primary" : "bg-transparent";
+
   return (
     <div className="relative">
       <Header />
@@ -79,7 +82,7 @@ export default function MapPage() {
         <AddSpotForm closeForm={() => setShowForm(false)} />
       </div>
 
-      <Navigation />
+      <Navigation backgroundClass={navBackground} />
     </div>
   );
 }
