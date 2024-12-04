@@ -42,7 +42,7 @@ export default function Home() {
             href="https://github.com/EricRisher/CaliGo"
             className=" hover:underline"
           >
-            v2.4.1
+            v2.5
           </a>
           <a href="https://www.ericrisher.com" className=" hover:underline">
             by <b>Eric Risher</b>
