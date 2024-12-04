@@ -42,7 +42,6 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
 }
 
 /* Global Heading Styles */
@@ -97,7 +96,108 @@ a {
   letter-spacing: 2px;
 }
 
-@media (max-width: 768px) {
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem; /* 16px padding */
+}
+
+.add-spot-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.grid-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Ensures square containers */
+  overflow: hidden; /* Prevents overflow from images */
+  border-radius: 0.5rem; /* Optional: Rounds the corners */
+}
+
+@media only screen and (min-width: 1024px) {
+  h1 {
+    font-size: 2.5rem; /* ~40px */
+  }
+  h2 {
+    font-size: 2.25rem; /* ~32px */
+  }
+  h3 {
+    font-size: 2rem; /* ~28px */
+  }
+  h4 {
+    font-size: 1.75rem; /* ~24px */
+  }
+  h5 {
+    font-size: 1.5rem; /* ~20px */
+  }
+  h6 {
+    font-size: 1.25rem; /* ~16px */
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+
+  a {
+    font-size: 1.1rem;
+    margin: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+
+  .navbar {
+    flex-direction: column; /* Stack buttons vertically */
+    height: 100%; /* Full height for left alignment */
+    width: auto; /* Adjust width as needed */
+    align-items: center; /* Align buttons to the left */
+    justify-content: flex-start; /* Start from the top */
+    padding: 1rem; /* Adjust padding for spacing */
+    padding-top: 7rem; /* Add space at the top */
+    background-color: transparent;
+  }
+
+  .navbar button {
+    flex-direction: row; /* Display icon and text in a row */
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%; /* Make buttons take full width */
+    margin-bottom: 2rem; /* Add space between buttons */
+  }
+
+  .navbar button span {
+    display: inline-block; /* Ensure text is visible */
+    margin-left: 0.5rem; /* Add spacing between icon and text */
+  }
+
+  .filter-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .icon-size {
+    width: 32px;
+    height: 32px;
+  }
+  .header input {
+    font-size: 20px;
+    line-height: 1.1;
+  }
+
+  .search > input {
+    width: 40vw;
+    padding: 0.5rem;
+  }
+
+  .spot {
+    width: 30rem;
+  }
+}
+
+@media (max-width: 1024px) {
   h1 {
     font-size: 1.7rem; /* ~32px */
   }
@@ -117,7 +217,11 @@ a {
     font-size: 0.95rem; /* ~15px */
   }
 
-  p,
+  p {
+    font-size: 0.8rem;
+    margin: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+
   a {
     font-size: 1rem;
     margin: 0.5rem 0.5rem 1rem 0.5rem;

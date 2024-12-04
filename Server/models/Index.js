@@ -8,50 +8,51 @@ const SavedSpot = require("./SavedSpot");
 // User-Spot (Created Spots) Relationship
 User.hasMany(Spot, {
   foreignKey: "userId",
-  as: "mySpots",
+  as: "mySpots", // Alias for spots created by the user
   onDelete: "CASCADE",
 });
 Spot.belongsTo(User, {
   foreignKey: "userId",
-  as: "creator",
+  as: "creator", // Alias for the user who created the spot
   onDelete: "CASCADE",
 });
 
 // User-Comment Relationship
 User.hasMany(Comment, {
   foreignKey: "userId",
-  as: "userComments",
+  as: "userComments", // Alias for comments by the user
   onDelete: "CASCADE",
 });
 Comment.belongsTo(User, {
   foreignKey: "userId",
-  as: "commentAuthor",
+  as: "commentAuthor", // Alias for the user who authored the comment
   onDelete: "CASCADE",
 });
 
 // Spot-Comment Relationship
 Spot.hasMany(Comment, {
   foreignKey: "spotId",
-  as: "Comments",
+  as: "Comments", // Alias for comments on a spot
   onDelete: "CASCADE",
 });
 Comment.belongsTo(Spot, {
   foreignKey: "spotId",
-  as: "commentedSpot",
+  as: "commentedSpot", // Alias for the spot being commented on
   onDelete: "CASCADE",
 });
 
-// User-Spot (Liked Spots) Many-to-Many Relationship
+// Spot-User Many-to-Many Relationship (Likes)
 User.belongsToMany(Spot, {
   through: Like,
-  as: "LikedSpots",
+  as: "LikedSpots", // Alias for spots liked by the user
   foreignKey: "userId",
   otherKey: "spotId",
   onDelete: "CASCADE",
 });
+
 Spot.belongsToMany(User, {
   through: Like,
-  as: "UsersWhoLiked",
+  as: "UsersWhoLiked", // Alias for users who liked the spot
   foreignKey: "spotId",
   otherKey: "userId",
   onDelete: "CASCADE",
@@ -60,14 +61,14 @@ Spot.belongsToMany(User, {
 // User-Spot (Saved Spots) Many-to-Many Relationship
 User.belongsToMany(Spot, {
   through: SavedSpot,
-  as: "SavedSpots",
+  as: "SavedSpots", // Alias for spots saved by the user
   foreignKey: "userId",
   otherKey: "spotId",
   onDelete: "CASCADE",
 });
 Spot.belongsToMany(User, {
   through: SavedSpot,
-  as: "UsersWhoSaved",
+  as: "UsersWhoSaved", // Alias for users who saved the spot
   foreignKey: "spotId",
   otherKey: "userId",
   onDelete: "CASCADE",

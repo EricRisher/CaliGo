@@ -78,22 +78,41 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
 });
 
 // Get all spots
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
+    const userId = req.user?.id;
+
     const spots = await Spot.findAll({
       include: [
-        { model: User, as: "creator", attributes: ["id", "username"] },
-        { model: Comment, as: "Comments", attributes: ["id", "commentText"] },
+        {
+          model: User,
+          as: "creator",
+          attributes: ["id", "username"],
+        },
+        {
+          model: Comment,
+          as: "Comments",
+          attributes: ["id", "commentText"],
+        },
+        {
+          model: User, // Reference to User model through Likes
+          as: "UsersWhoLiked", // Alias used in the relationship
+          attributes: ["id"],
+          through: { attributes: [] }, // Exclude intermediate table fields
+          where: { id: userId },
+          required: false, // Include even if user hasn't liked the spot
+        },
       ],
       order: [["id", "DESC"]],
     });
 
-    const spotsWithCommentCount = spots.map((spot) => ({
-      ...spot.toJSON(), // Convert Sequelize instance to plain object
-      commentCount: spot.Comments ? spot.Comments.length : 0, // Count comments
+    const spotsWithLikeState = spots.map((spot) => ({
+      ...spot.toJSON(),
+      userLiked: spot.UsersWhoLiked.length > 0, // Check if user liked the spot
+      commentCount: spot.Comments ? spot.Comments.length : 0,
     }));
 
-    res.status(200).json(spotsWithCommentCount);
+    res.status(200).json(spotsWithLikeState);
   } catch (error) {
     console.error("Error fetching spots:", error);
     res.status(500).json({ message: "Failed to fetch spots" });

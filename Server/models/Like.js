@@ -1,5 +1,3 @@
-// models/Like.js
-
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/connection");
 
@@ -9,6 +7,7 @@ Like.init(
   {
     id: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
@@ -31,14 +30,9 @@ Like.init(
   },
   {
     sequelize,
-    modelName: "Like",
-    tableName: "likes",
     timestamps: true,
-    uniqueKeys: {
-      like_unique: {
-        fields: ["userId", "spotId"],
-      },
-    },
+    freezeTableName: true,
+    modelName: "Like",
   }
 );
 

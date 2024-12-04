@@ -8,13 +8,14 @@ export function Header() {
       <Image
         src="/icons/icon-trans.png"
         alt="CaliGo"
+        className="icon-logo"
         width={50}
         height={50}
         onClick={() => (window.location.href = "/home")}
       />
       <div
         className={
-          "flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md"
+          "search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md"
         }
       >
         <input
@@ -24,15 +25,22 @@ export function Header() {
           className={"bg-transparent focus:outline-none"}
         />
         <button>
-          <Image src="/icons/filter.png" alt="Filter" width={20} height={20} />
+          <Image
+            src="/icons/filter.png"
+            alt="Filter"
+            width={20}
+            height={20}
+            className="filter-icon"
+          />
         </button>
       </div>
       <button>
         <Image
           src="/icons/bell.png"
           alt="Notifications"
-          width={24}
-          height={24}
+          width={32}
+          height={32}
+          className="ml-3 mr-1 icon-size"
         />
       </button>
     </header>

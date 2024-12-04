@@ -42,6 +42,10 @@ Spot.init(
         max: 180,
       },
     },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false, // Assuming location is required
+    },
     image: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -53,6 +57,10 @@ Spot.init(
         model: User,
         key: "id",
       },
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0, // Default to 0 likes
     },
   },
   {

@@ -42,30 +42,38 @@ export function Spots({ spotId }: { spotId?: string }) {
     {}
   );
 
-  const userId = 1; // Example user ID, replace with actual logged-in user ID
-
   useEffect(() => {
     const fetchSpots = async () => {
       try {
         const response = await fetch(
-          spotId ? `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}` : `${process.env.NEXT_PUBLIC_API_URL}/spots`
+          `${process.env.NEXT_PUBLIC_API_URL}/spots`,
+          {
+            credentials: "include",
+          }
         );
-        const data = await response.json();
-        const spotArray = spotId ? [data] : data;
 
-        const likedPostsState = spotArray.reduce(
+        if (!response.ok) {
+          throw new Error(`Failed to fetch spots: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Set spots data and like states
+        setSpotsData(data);
+
+        // Map initial liked states
+        const initialLikedPosts = data.reduce(
           (acc: { [id: number]: boolean }, spot: Spot) => {
             acc[spot.id] = spot.userLiked;
             return acc;
           },
-          {} as { [id: number]: boolean }
+          {}
         );
 
-        setLikedPosts(likedPostsState);
-        setSpotsData(spotArray);
+        setLikedPosts(initialLikedPosts); // Update the likedPosts state
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching spots data:", error);
+        console.error("Error fetching spots:", error);
         setLoading(false);
       }
     };
@@ -75,7 +83,9 @@ export function Spots({ spotId }: { spotId?: string }) {
 
   const fetchComments = async (spotId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/${spotId}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/comments/${spotId}`
+      );
       const comments = await response.json();
       setCommentsData((prev) => ({
         ...prev,
@@ -86,35 +96,57 @@ export function Spots({ spotId }: { spotId?: string }) {
     }
   };
 
-  const toggleLike = async (spotId: number) => {
-    const isLiked = likedPosts[spotId];
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}/${
-      isLiked ? "unlike" : "like"
-    }`;
+ const toggleLike = async (spotId: number) => {
+   const isLiked = likedPosts[spotId];
+   const url = `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}/${
+     isLiked ? "unlike" : "like"
+   }`;
 
-    try {
-      const response = await fetch(url, {
-        method: isLiked ? "DELETE" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // Ensure credentials are sent
-        body: JSON.stringify({ userId }), // Assuming you are sending userId as part of the request
-      });
+   try {
+     // Optimistically update UI
+     setLikedPosts((prev) => ({ ...prev, [spotId]: !isLiked }));
+     setSpotsData((prevSpots) =>
+       prevSpots.map((spot) =>
+         spot.id === spotId
+           ? { ...spot, likes: isLiked ? spot.likes - 1 : spot.likes + 1 }
+           : spot
+       )
+     );
 
-      if (response.ok) {
-        const { likes } = await response.json();
-        setSpotsData((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.id === spotId ? { ...spot, likes } : spot
-          )
-        );
-        setLikedPosts((prev) => ({ ...prev, [spotId]: !isLiked }));
-      } else {
-        console.error("Error response from server:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error liking/unliking post:", error);
-    }
-  };
+     // Send request to backend
+     const response = await fetch(url, {
+       method: isLiked ? "DELETE" : "POST",
+       headers: { "Content-Type": "application/json" },
+       credentials: "include",
+     });
+
+     if (!response.ok) {
+       console.error("Failed to toggle like:", response.statusText);
+
+       // Revert optimistic update if backend fails
+       setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
+       setSpotsData((prevSpots) =>
+         prevSpots.map((spot) =>
+           spot.id === spotId
+             ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
+             : spot
+         )
+       );
+     }
+   } catch (error) {
+     console.error("Error toggling like:", error);
+
+     // Revert optimistic update in case of error
+     setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
+     setSpotsData((prevSpots) =>
+       prevSpots.map((spot) =>
+         spot.id === spotId
+           ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
+           : spot
+       )
+     );
+   }
+ };
 
   const toggleBookmark = (id: number) => {
     setBookmarkedPosts((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -133,7 +165,7 @@ export function Spots({ spotId }: { spotId?: string }) {
       {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
-          className="bg-gray-200 rounded-md shadow-md p-4 mb-4 max-w-sm mx-auto"
+          className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center">
             <div>
@@ -149,8 +181,9 @@ export function Spots({ spotId }: { spotId?: string }) {
               />
             </button>
           </div>
-          <div className="bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
+          <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={spot.image}
                 alt={spot.spotName}
@@ -162,7 +195,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div className="flex justify-between items-center">
             <div className="flex space-x-4 items-center">
-              <button>
+              <button onClick={() => toggleLike(spot.id)}>
                 <Image
                   src={
                     likedPosts[spot.id]

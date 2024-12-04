@@ -28,30 +28,71 @@ export function Navigation() {
   };
 
   return (
-    <nav className="navbar fixed bottom-0 left-0 w-full flex justify-around items-center bg-primary p-4">
+    <nav className="navbar bg-primary">
       <button
         onClick={() => router.push("/home")}
-        className="flex flex-col items-center"
+        className="flex flex-col items-center md:flex-row md:space-x-4"
       >
-        <Image src="/icons/home.png" alt="Home" width={32} height={32} />
+        <Image
+          src="/icons/home.png"
+          alt="Home"
+          className="icon-size"
+          width={32}
+          height={32}
+        />
+        <span className="hidden md:inline text-sm md:text-lg">Home</span>
       </button>
       <button
         onClick={() => router.push("/map")}
-        className="flex flex-col items-center"
+        className="flex flex-col items-center md:flex-row md:space-x-4"
       >
-        <Image src="/icons/location.png" alt="Map" width={32} height={32} />
+        <Image
+          src="/icons/location.png"
+          alt="Map"
+          className="icon-size"
+          width={32}
+          height={32}
+        />
+        <span className="hidden md:inline text-sm md:text-lg">Map</span>
       </button>
-      <button onClick={goToAddSpot} className="flex flex-col items-center">
-        <Image src="/icons/plus.png" alt="Add" width={48} height={48} />
+      <button
+        onClick={goToAddSpot}
+        className="flex flex-col items-center md:flex-row md:space-x-4"
+      >
+        <Image
+          src="/icons/plus.png"
+          alt="Add"
+          className="icon-size"
+          width={48}
+          height={48}
+        />
+        <span className="hidden md:inline text-sm md:text-lg">Add Spot</span>
       </button>
-      <button onClick={goToSaved} className="flex flex-col items-center">
-        <Image src="/icons/bookmark.png" alt="Saved" width={32} height={32} />
+      <button
+        onClick={goToSaved}
+        className="flex flex-col items-center md:flex-row md:space-x-4"
+      >
+        <Image
+          src="/icons/bookmark.png"
+          alt="Saved"
+          className="icon-size"
+          width={32}
+          height={32}
+        />
+        <span className="hidden md:inline text-sm md:text-lg">Saved</span>
       </button>
       <button
         onClick={() => router.push("/profile")}
-        className="flex flex-col items-center"
+        className="flex flex-col items-center md:flex-row md:space-x-4"
       >
-        <Image src="/icons/user.png" alt="Profile" width={32} height={32} />
+        <Image
+          src="/icons/user.png"
+          alt="Profile"
+          className="icon-size"
+          width={32}
+          height={32}
+        />
+        <span className="hidden md:inline text-sm md:text-lg">Profile</span>
       </button>
     </nav>
   );

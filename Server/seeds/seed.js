@@ -6,7 +6,8 @@ const seedDatabase = async () => {
     console.log("Database tables created successfully!");
   } catch (error) {
     console.error("Error creating tables:", error);
-  } finally {
+  } 
+  finally {
     process.exit(0);
   }
 };

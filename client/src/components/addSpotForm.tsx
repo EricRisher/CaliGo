@@ -35,14 +35,14 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
     // Parse the coordinates to numbers
     const latitude = parseFloat(coords[0]);
     const longitude = parseFloat(coords[1]);
-    const location = `${latitude}, ${longitude}`; // Concatenate to form location string
+    const location = `${latitude},${longitude}`; // Concatenate to form location string
 
     const formData = new FormData();
     formData.append("spotName", spotName);
     formData.append("description", spotDescription);
     formData.append("latitude", latitude.toString());
     formData.append("longitude", longitude.toString());
-    formData.append("location", location);
+    formData.append("location", location); // Append location here
     if (image) {
       formData.append("image", image);
     }
