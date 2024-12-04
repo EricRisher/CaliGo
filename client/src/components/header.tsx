@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export function Header() {
   return (
-    <header className="header fixed top-0 left-0 w-full flex justify-between items-center bg-primary p-4 shadow-md z-10">
+    <header className="header bg-primary">
       <Image
         src="/icons/icon-trans.png"
         alt="CaliGo"
@@ -13,16 +13,12 @@ export function Header() {
         height={50}
         onClick={() => (window.location.href = "/home")}
       />
-      <div
-        className={
-          "search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md"
-        }
-      >
+      <div className="search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md">
         <input
           type="text"
           placeholder="Search spots"
           disabled={false}
-          className={"bg-transparent focus:outline-none"}
+          className="bg-transparent focus:outline-none"
         />
         <button>
           <Image

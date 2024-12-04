@@ -31,7 +31,7 @@ export function Navigation() {
     <nav className="navbar bg-primary">
       <button
         onClick={() => router.push("/home")}
-        className="flex flex-col items-center md:flex-row md:space-x-4"
+        className="relative bottom-1 flex flex-col items-center md:flex-row md:space-x-4 "
       >
         <Image
           src="/icons/home.png"
@@ -44,7 +44,7 @@ export function Navigation() {
       </button>
       <button
         onClick={() => router.push("/map")}
-        className="flex flex-col items-center md:flex-row md:space-x-4"
+        className="relative bottom-1 flex flex-col items-center md:flex-row md:space-x-4"
       >
         <Image
           src="/icons/location.png"
@@ -57,7 +57,7 @@ export function Navigation() {
       </button>
       <button
         onClick={goToAddSpot}
-        className="flex flex-col items-center md:flex-row md:space-x-4"
+        className="relative bottom-1 flex flex-col items-center md:flex-row md:space-x-4"
       >
         <Image
           src="/icons/plus.png"
@@ -70,7 +70,7 @@ export function Navigation() {
       </button>
       <button
         onClick={goToSaved}
-        className="flex flex-col items-center md:flex-row md:space-x-4"
+        className="relative bottom-1 flex flex-col items-center md:flex-row md:space-x-4"
       >
         <Image
           src="/icons/bookmark.png"
@@ -83,7 +83,7 @@ export function Navigation() {
       </button>
       <button
         onClick={() => router.push("/profile")}
-        className="flex flex-col items-center md:flex-row md:space-x-4"
+        className="relative bottom-1 flex flex-col items-center md:flex-row md:space-x-4"
       >
         <Image
           src="/icons/user.png"
