@@ -1,4 +1,3 @@
-# Dockerfile for Node.js backend
 FROM node:18-alpine
 
 # Install dependencies for bcrypt on Alpine
@@ -14,5 +13,5 @@ COPY . .
 # Expose the backend port
 EXPOSE 3001
 
-# Wait for MySQL to be available, then start the server
+# Default command (can be overridden in docker-compose)
 CMD /bin/sh -c "while ! nc -z mysql 3306; do echo 'Waiting for MySQL...'; sleep 3; done && node server.js"

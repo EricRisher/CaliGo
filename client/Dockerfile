@@ -1,27 +1,24 @@
-# Dockerfile for Next.js frontend
-# Use the official Node.js image
-FROM node:18-alpine
-
-# Set the working directory
+# Base image for dependencies
+FROM node:18-alpine AS deps
 WORKDIR /app
-
-# Set environment variable for production
-ENV NODE_ENV=production
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm install 
-
-# Copy the rest of the application code
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Build the Next.js app
 RUN npm run build
 
-# Expose the port Next.js runs on
-EXPOSE 3000
+# Production image
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
 
-# Start the Next.js app
+EXPOSE 3000
 CMD ["npm", "start"]
