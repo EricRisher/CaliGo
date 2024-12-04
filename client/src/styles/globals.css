@@ -120,6 +120,19 @@ a {
   border-radius: 0.5rem; /* Optional: Rounds the corners */
 }
 
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+    padding: calc(env(safe-area-inset-top) + 1rem) 1rem 1rem; /* Adjust padding for the notch */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
 @media only screen and (min-width: 1024px) {
   h1 {
     font-size: 2.5rem; /* ~40px */
