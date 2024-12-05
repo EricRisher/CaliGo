@@ -11,6 +11,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    volumes:
+      - /srv/CaliGo/data/frontend_cache:/app/.next/cache
     depends_on:
       - backend
     networks:

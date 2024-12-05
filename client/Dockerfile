@@ -8,7 +8,7 @@ RUN npm ci --only=production
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . . 
+COPY . .
 RUN npm run build
 
 # 3. Production runtime
@@ -23,6 +23,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
+
+# Ensure necessary directories are writable
+RUN mkdir -p .next/cache && chmod -R 777 .next/cache
 
 # Reduce attack surface by switching to a non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
