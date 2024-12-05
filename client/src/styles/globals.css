@@ -131,6 +131,21 @@ a {
   padding: calc(env(safe-area-inset-top) + 1rem) 1rem 1rem; /* Add padding for the notch */
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 10;
+  transition: transform 1s ease, opacity 1s ease;
+}
+
+.sticky-header {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.header.hidden {
+  transform: translateY(-100%); /* Move header out of view */
+  opacity: 0; /* Optional: Hide with transparency */
+}
+
+.header:not(.hidden) {
+  transform: translateY(0); /* Return header to view */
+  opacity: 1;
 }
 
 @media only screen and (min-width: 1024px) {
@@ -300,11 +315,6 @@ button {
 
 .btn-primary:focus {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(195, 212, 255, 0.7);
-}
-
-.header,
-.navbar {
-  z-index: 100;
 }
 
 .leaflet-control-container .leaflet-top.leaflet-left {
