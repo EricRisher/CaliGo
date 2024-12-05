@@ -20,8 +20,6 @@ interface Spot {
   id: number;
   spotName: string;
   location: string;
-  latitude: number;
-  longitude: number;
   description: string;
   image: string;
   User: User;
@@ -44,34 +42,6 @@ export function Spots({ spotId }: { spotId?: string }) {
     {}
   );
 
-  // Function to fetch city name from coordinates using Google Maps Geocoding API
-  const fetchCityFromCoordinates = async (
-    latitude: number,
-    longitude: number
-  ): Promise<string> => {
-    try {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
-      );
-
-      if (!response.ok) {
-        console.error("Failed to fetch city name:", response.statusText);
-        return "Unknown Location";
-      }
-
-      const data = await response.json();
-      const city = data.results[0]?.address_components.find((component: any) =>
-        component.types.includes("locality")
-      )?.long_name;
-
-      return city || "Unknown Location";
-    } catch (error) {
-      console.error("Error fetching city name:", error);
-      return "Unknown Location";
-    }
-  };
-
   useEffect(() => {
     const fetchSpots = async () => {
       try {
@@ -86,23 +56,13 @@ export function Spots({ spotId }: { spotId?: string }) {
           throw new Error(`Failed to fetch spots: ${response.statusText}`);
         }
 
-        const data: Spot[] = await response.json();
+        const data = await response.json();
 
-        // Resolve coordinates to city names
-        const spotsWithCity = await Promise.all(
-          data.map(async (spot) => {
-            const cityName = await fetchCityFromCoordinates(
-              spot.latitude,
-              spot.longitude
-            );
-            return { ...spot, location: cityName };
-          })
-        );
-
-        setSpotsData(spotsWithCity);
+        // Set spots data and like states
+        setSpotsData(data);
 
         // Map initial liked states
-        const initialLikedPosts = spotsWithCity.reduce(
+        const initialLikedPosts = data.reduce(
           (acc: { [id: number]: boolean }, spot: Spot) => {
             acc[spot.id] = spot.userLiked;
             return acc;
@@ -121,57 +81,72 @@ export function Spots({ spotId }: { spotId?: string }) {
     fetchSpots();
   }, [spotId]);
 
-  const toggleLike = async (spotId: number) => {
-    const isLiked = likedPosts[spotId];
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}/${
-      isLiked ? "unlike" : "like"
-    }`;
-
+  const fetchComments = async (spotId: number) => {
     try {
-      // Optimistically update UI
-      setLikedPosts((prev) => ({ ...prev, [spotId]: !isLiked }));
-      setSpotsData((prevSpots) =>
-        prevSpots.map((spot) =>
-          spot.id === spotId
-            ? { ...spot, likes: isLiked ? spot.likes - 1 : spot.likes + 1 }
-            : spot
-        )
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/comments/${spotId}`
       );
-
-      // Send request to backend
-      const response = await fetch(url, {
-        method: isLiked ? "DELETE" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        console.error("Failed to toggle like:", response.statusText);
-
-        // Revert optimistic update if backend fails
-        setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
-        setSpotsData((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.id === spotId
-              ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
-              : spot
-          )
-        );
-      }
+      const comments = await response.json();
+      setCommentsData((prev) => ({
+        ...prev,
+        [spotId]: Array.isArray(comments) ? comments : [],
+      }));
     } catch (error) {
-      console.error("Error toggling like:", error);
-
-      // Revert optimistic update in case of error
-      setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
-      setSpotsData((prevSpots) =>
-        prevSpots.map((spot) =>
-          spot.id === spotId
-            ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
-            : spot
-        )
-      );
+      console.error("Error fetching comments:", error);
     }
   };
+
+ const toggleLike = async (spotId: number) => {
+   const isLiked = likedPosts[spotId];
+   const url = `${process.env.NEXT_PUBLIC_API_URL}/spots/${spotId}/${
+     isLiked ? "unlike" : "like"
+   }`;
+
+   try {
+     // Optimistically update UI
+     setLikedPosts((prev) => ({ ...prev, [spotId]: !isLiked }));
+     setSpotsData((prevSpots) =>
+       prevSpots.map((spot) =>
+         spot.id === spotId
+           ? { ...spot, likes: isLiked ? spot.likes - 1 : spot.likes + 1 }
+           : spot
+       )
+     );
+
+     // Send request to backend
+     const response = await fetch(url, {
+       method: isLiked ? "DELETE" : "POST",
+       headers: { "Content-Type": "application/json" },
+       credentials: "include",
+     });
+
+     if (!response.ok) {
+       console.error("Failed to toggle like:", response.statusText);
+
+       // Revert optimistic update if backend fails
+       setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
+       setSpotsData((prevSpots) =>
+         prevSpots.map((spot) =>
+           spot.id === spotId
+             ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
+             : spot
+         )
+       );
+     }
+   } catch (error) {
+     console.error("Error toggling like:", error);
+
+     // Revert optimistic update in case of error
+     setLikedPosts((prev) => ({ ...prev, [spotId]: isLiked }));
+     setSpotsData((prevSpots) =>
+       prevSpots.map((spot) =>
+         spot.id === spotId
+           ? { ...spot, likes: isLiked ? spot.likes + 1 : spot.likes - 1 }
+           : spot
+       )
+     );
+   }
+ };
 
   const toggleBookmark = (id: number) => {
     setBookmarkedPosts((prev) => ({ ...prev, [id]: !prev[id] }));

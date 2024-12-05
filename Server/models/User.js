@@ -44,12 +44,6 @@ User.init(
       allowNull: false,
       defaultValue: 0,
     },
-    profilePicture: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: "../../Client/public/icons/user.png",
-    },
-
   },
   {
     sequelize,

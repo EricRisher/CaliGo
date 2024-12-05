@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// Define the interface for Spot data
 interface Spot {
   id: number;
   spotName: string;
@@ -11,37 +10,11 @@ interface Spot {
   image: string;
 }
 
-export default function CustomMap() {
+export default function CustomMap({ spots }: { spots: Spot[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [spots, setSpots] = useState<Spot[]>([]);
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
 
-  // Fetch spots data from the backend API
-  useEffect(() => {
-    const fetchSpots = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/spots`,
-          {
-            credentials: "include",
-          }
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch spots: ${response.statusText}`);
-        }
-
-        const data: Spot[] = await response.json();
-        setSpots(data);
-      } catch (error) {
-        console.error("Error fetching spots:", error);
-      }
-    };
-
-    fetchSpots();
-  }, []);
-
-  // Initialize the Google Map
   useEffect(() => {
     if (mapRef.current && !map) {
       const mapStyle = [
@@ -82,16 +55,16 @@ export default function CustomMap() {
       ];
 
       const newMap = new google.maps.Map(mapRef.current, {
-        center: { lat: 34.0522, lng: -118.2437 }, // Default to Los Angeles
+        center: { lat: 34.0522, lng: -118.2437 },
         zoom: 10,
         mapTypeId: "hybrid",
-        styles: mapStyle, // Apply the custom style
+        styles: mapStyle, // Apply the custom style here
       });
       setMap(newMap);
     }
   }, [map]);
 
-  // Add Spot markers to the map
+  // Add Spots to Map
   useEffect(() => {
     if (map) {
       spots.forEach((spot) => {
@@ -102,12 +75,7 @@ export default function CustomMap() {
         });
 
         const infoWindow = new google.maps.InfoWindow({
-          content: `<div style="text-align:center;">
-                      <h3>${spot.spotName}</h3>
-                      <a href="/spot/${spot.id}" target="_blank">
-                        <img src="${spot.image}" alt="${spot.spotName}" style="width:100px; height:auto;" />
-                      </a>
-                    </div>`,
+          content: `<a href="/spot/${spot.id}">${spot.spotName}</a>`,
         });
 
         marker.addListener("click", () => {
@@ -117,7 +85,7 @@ export default function CustomMap() {
     }
   }, [map, spots]);
 
-  // Locate user and add a marker
+  // Locate User and Add Marker
   const handleLocateUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -134,17 +102,16 @@ export default function CustomMap() {
               position: userLatLng,
               map: map,
               title: "You are here",
-              icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Custom icon for user location
             });
             setUserMarker(newMarker);
           }
         },
         () => {
-          alert("Unable to retrieve your location.");
+          alert("Unable to retrieve your location");
         }
       );
     } else {
-      alert("Geolocation is not supported by your browser.");
+      alert("Geolocation is not supported by your browser");
     }
   };
 
@@ -152,7 +119,7 @@ export default function CustomMap() {
     <div style={{ position: "relative" }}>
       <div
         ref={mapRef}
-        style={{ height: "100vh", width: "100%", position: "absolute" }}
+        style={{ height: "91vh", width: "100%", position: "absolute" }}
       ></div>
       <button
         onClick={handleLocateUser}

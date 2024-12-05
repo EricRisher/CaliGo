@@ -42,6 +42,7 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
+  padding-top: calc(env(safe-area-inset-top) + 0.5rem);
 }
 
 /* Global Heading Styles */
@@ -94,10 +95,6 @@ a {
   font-family: "Lora", sans-serif;
   margin: 1rem 1rem 1.5rem 1rem;
   letter-spacing: 2px;
-}
-
-.bg-primary {
-  background-color: rgb(195, 212, 255);
 }
 
 .navbar {
@@ -175,6 +172,7 @@ a {
     justify-content: flex-start; /* Start from the top */
     padding: 1rem; /* Adjust padding for spacing */
     padding-top: 7rem; /* Add space at the top */
+    background-color: transparent;
   }
 
   .navbar button {
@@ -234,7 +232,7 @@ a {
   }
 
   p {
-    font-size: 1rem;
+    font-size: 0.8rem;
     margin: 0.5rem 0.5rem 1rem 0.5rem;
   }
 
@@ -299,6 +297,11 @@ button {
 
 .btn-primary:focus {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(195, 212, 255, 0.7);
+}
+
+.header,
+.navbar {
+  z-index: 100;
 }
 
 .leaflet-control-container .leaflet-top.leaflet-left {

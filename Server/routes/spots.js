@@ -4,10 +4,12 @@ const fs = require("fs");
 const path = require("path");
 const { Spot, User, Comment, Like } = require("../models");
 const authMiddleware = require("../middlewares/authMiddleware");
+
 const router = express.Router();
 
 // Set the base upload directory on the server-side
 const baseUploadPath = path.join(__dirname, "../uploads");
+console.log("Base Upload Path:", baseUploadPath);
 
 if (!fs.existsSync(baseUploadPath)) {
   fs.mkdirSync(baseUploadPath, { recursive: true });
@@ -76,12 +78,10 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
 });
 
 // Get all spots
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    // Ensure the user ID is available
     const userId = req.user?.id;
 
-    // Fetch all spots with related data
     const spots = await Spot.findAll({
       include: [
         {
@@ -95,28 +95,22 @@ router.get("/", async (req, res) => {
           attributes: ["id", "commentText"],
         },
         {
-          model: User,
-          as: "UsersWhoLiked",
+          model: User, // Reference to User model through Likes
+          as: "UsersWhoLiked", // Alias used in the relationship
           attributes: ["id"],
           through: { attributes: [] }, // Exclude intermediate table fields
-          where: userId ? { id: userId } : undefined, // Apply filter if userId exists
+          where: { id: userId },
           required: false, // Include even if user hasn't liked the spot
         },
       ],
       order: [["id", "DESC"]],
     });
 
-    // Enhance spots with userLiked and commentCount fields
-    const spotsWithLikeState = spots.map((spot) => {
-      const jsonSpot = spot.toJSON();
-      return {
-        ...jsonSpot,
-        userLiked:
-          Array.isArray(jsonSpot.UsersWhoLiked) &&
-          jsonSpot.UsersWhoLiked.length > 0,
-        commentCount: jsonSpot.Comments ? jsonSpot.Comments.length : 0,
-      };
-    });
+    const spotsWithLikeState = spots.map((spot) => ({
+      ...spot.toJSON(),
+      userLiked: spot.UsersWhoLiked.length > 0, // Check if user liked the spot
+      commentCount: spot.Comments ? spot.Comments.length : 0,
+    }));
 
     res.status(200).json(spotsWithLikeState);
   } catch (error) {
@@ -181,22 +175,13 @@ router.put("/:spotId", authMiddleware, async (req, res) => {
 // Delete a spot by spotId (Protected Route)
 router.delete("/:spotId", authMiddleware, async (req, res) => {
   try {
-    const spotId = req.params.spotId;
-    const userId = req.user.userId; // Access userId from req.auth
-
-    console.log("Deleting spot:", { spotId, userId }); // Debugging: Log spotId and userId
-
-    if (!userId) {
-      return res.status(403).json({ error: "Unauthorized: Missing userId." });
-    }
-
-    const spot = await Spot.findByPk(spotId);
-
+    const spot = await Spot.findByPk(req.params.spotId);
     if (!spot) {
       return res.status(404).json({ error: "Spot not found" });
     }
 
-    if (spot.userId !== userId) {
+    // Ensure the user deleting the spot is the owner
+    if (spot.userId !== req.auth.userId) {
       return res
         .status(403)
         .json({ error: "You are not authorized to delete this spot" });
@@ -205,16 +190,14 @@ router.delete("/:spotId", authMiddleware, async (req, res) => {
     await spot.destroy();
     res.status(204).send();
   } catch (error) {
-    console.error("Error in delete route:", error); // Debugging: Log error details
     res.status(500).json({ error: error.message });
   }
 });
 
-
 // Like a spot (Protected Route)
 router.post("/:spotId/like", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
-  const userId = req.user?.userId; // Use req.user.id as set by authMiddleware
+  const userId = req.user?.id; // Use req.user.id as set by authMiddleware
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });

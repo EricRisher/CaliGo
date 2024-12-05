@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProtectedPage from "@/components/ProtectedPage";
-import Button from "../../components/button";
 
 // Define interfaces for Spot, Comment, and User
 interface Comment {
@@ -35,7 +34,9 @@ interface Spot {
 
 export default function ProfilePage() {
   return (
+    <React.Suspense fallback={<div>Loading...</div>}>
       <ProfileContent />
+    </React.Suspense>
   );
 }
 
@@ -44,7 +45,6 @@ function ProfileContent() {
   const [mySpots, setMySpots] = useState<Spot[]>([]);
   const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
 
@@ -103,16 +103,6 @@ function ProfileContent() {
 
   const getXpForNextLevel = (level: number): number => level * 100;
 
-  const handleButtonClick = () => {
-    if (!isEditing) {
-      // Navigate to edit-profile when confirmed
-      router.push("/edit-profile");
-    } else {
-      // Toggle the button to "Confirm"
-      setIsEditing(true);
-    }
-  };
-
   return (
     //  <ProtectedPage>
     <div className="relative flex flex-col min-h-screen bg-primary">
@@ -132,19 +122,9 @@ function ProfileContent() {
       </div>
 
       {/* Profile Picture and Username */}
-      <div className="profile-container flex flex-col items-center mt-4 relative z-10">
+      <div className="flex flex-col items-center mt-4 relative z-10">
         <Image src="/icons/user.png" alt="Profile" width={128} height={128} />
         <h1 className="text-2xl">{username}</h1>
-        <div className="w-full flex justify-end px-4 space-x-4">
-          <button
-            onClick={handleButtonClick}
-            className={`justify-end text-sm text-white py-2 px-4 rounded ${
-              isEditing ? "bg-green-500" : "bg-gray-200 text-gray-900"
-            }`}
-          >
-            {isEditing ? "Confirm" : "Edit Profile"}
-          </button>
-        </div>
       </div>
 
       {/* XP and Level Section */}

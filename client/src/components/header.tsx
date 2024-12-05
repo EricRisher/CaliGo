@@ -8,7 +8,7 @@ export function Header() {
       <Image
         src="/icons/icon-trans.png"
         alt="CaliGo"
-        className="icon-logo z-1000"
+        className="icon-logo"
         width={50}
         height={50}
         onClick={() => (window.location.href = "/home")}
