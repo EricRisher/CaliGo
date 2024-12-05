@@ -187,8 +187,17 @@ export function Spots({ spotId }: { spotId?: string }) {
           <div className="flex justify-between items-center">
             <div>
               <p className="font-bold mb-0">{spot.spotName}</p>
-              <p className="mt-0">{spot.location}</p>
+              <p className="mt-0 ml-0">
+                <a
+                  href={`https://www.google.com/maps?q=${spot.latitude},${spot.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {spot.location}
+                </a>
+              </p>
             </div>
+
             <button>
               {/* <img
                 src={profilePicture || "/icons/user.png"}
