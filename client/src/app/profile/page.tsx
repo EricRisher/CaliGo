@@ -104,7 +104,7 @@ function ProfileContent() {
   const getXpForNextLevel = (level: number): number => level * 100;
 
   return (
-    //  <ProtectedPage>
+ <ProtectedPage>
     <div className="relative flex flex-col min-h-screen bg-primary">
       {/* Profile Header */}
       <div className="relative w-full p-4 flex justify-between items-center z-10">
@@ -227,6 +227,6 @@ function ProfileContent() {
         </button>
       </div>
     </div>
-    //   </ProtectedPage>
+   </ProtectedPage>
   );
 }
