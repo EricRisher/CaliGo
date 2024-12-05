@@ -163,6 +163,10 @@ a {
     margin: 0.5rem 0.5rem 1rem 0.5rem;
   }
 
+  .map {
+    height: 100vh !important;
+  }
+
   .navbar {
     flex-direction: column; /* Stack buttons vertically */
     height: 100%; /* Full height for left alignment */

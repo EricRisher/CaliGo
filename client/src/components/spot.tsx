@@ -190,13 +190,13 @@ export function Spots({ spotId }: { spotId?: string }) {
               <p className="mt-0">{spot.location}</p>
             </div>
             <button>
-              <img
+              {/* <img
                 src={profilePicture || "/icons/user.png"}
                 alt="Profile"
                 width={48}
                 height={48}
                 className="rounded-full"
-              />
+              /> */}
             </button>
           </div>
           <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">

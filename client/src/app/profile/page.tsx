@@ -104,32 +104,32 @@ function ProfileContent() {
   const getXpForNextLevel = (level: number): number => level * 100;
 
   return (
- <ProtectedPage>
-    <div className="relative flex flex-col min-h-screen bg-primary">
-      {/* Profile Header */}
-      <div className="relative w-full p-4 flex justify-between items-center z-10">
-        <button onClick={() => (window.location.href = "/home")}>
-          <Image src="/icons/close.png" alt="Close" width={32} height={32} />
-        </button>
-        <button>
+    <ProtectedPage>
+      <div className="relative flex flex-col min-h-screen bg-primary">
+        {/* Profile Header */}
+        <div className="relative w-full p-4 flex justify-between items-center z-10">
+          <button onClick={() => (window.location.href = "/home")}>
+            <Image src="/icons/close.png" alt="Close" width={32} height={32} />
+          </button>
+          {/* <button>
           <Image
             src="/icons/bell.png"
             alt="Notifications"
             width={32}
             height={32}
           />
-        </button>
-      </div>
+        </button> */}
+        </div>
 
-      {/* Profile Picture and Username */}
-      <div className="flex flex-col items-center mt-4 relative z-10">
-        <Image src="/icons/user.png" alt="Profile" width={128} height={128} />
-        <h1 className="text-2xl">{username}</h1>
-      </div>
+        {/* Profile Picture and Username */}
+        <div className="flex flex-col items-center mt-4 relative z-10">
+          {/* <Image src="/icons/user.png" alt="Profile" width={128} height={128} /> */}
+          <h1 className="text-2xl">{`${username}'s Profile`}</h1>
+        </div>
 
-      {/* XP and Level Section */}
-      <section className="flex flex-row justify-around mb-6 relative z-10"></section>
-      <div className="relative z-10 w-full px-4 mb-6">
+        {/* XP and Level Section */}
+        <section className="flex flex-row justify-around mb-6 relative z-10"></section>
+        {/* <div className="relative z-10 w-full px-4 mb-6">
         <div className="flex justify-between text-sm mb-1">
           <span>Level {level}</span>
           <span>
@@ -143,90 +143,90 @@ function ProfileContent() {
             style={{ width: `${(xp / getXpForNextLevel(level)) * 100}%` }}
           />
         </div>
-      </div>
+      </div> */}
 
-      {/* Tabs for My Spots and Saved Spots */}
-      <div className="w-full px-4 relative z-10 bg-slate-300">
-        <div className="flex space-x-4 m-4">
-          <button
-            className={`py-2 px-4 rounded-lg ${
-              activeTab === "My Spots"
-                ? "bg-secondary text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("My Spots")}
-          >
-            My Spots
-          </button>
-          <button
-            className={`py-2 px-4 rounded-lg ${
-              activeTab === "Saved Spots"
-                ? "bg-secondary text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("Saved Spots")}
-          >
-            Saved Spots
-          </button>
+        {/* Tabs for My Spots and Saved Spots */}
+        <div className="w-full px-4 relative z-10 bg-slate-300 h-[80vh]">
+          <div className="flex space-x-4 m-4 ">
+            <button
+              className={`py-2 px-4 rounded-lg ${
+                activeTab === "My Spots"
+                  ? "bg-secondary text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setActiveTab("My Spots")}
+            >
+              My Spots
+            </button>
+            <button
+              className={`py-2 px-4 rounded-lg ${
+                activeTab === "Saved Spots"
+                  ? "bg-secondary text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setActiveTab("Saved Spots")}
+            >
+              Saved Spots
+            </button>
+          </div>
+
+          {/* Display My Spots or Saved Spots */}
+          <div className="grid grid-cols-3 gap-3">
+            {activeTab === "My Spots" &&
+              mySpots.map((spot) => (
+                <div
+                  key={spot.id}
+                  className="relative overflow-hidden rounded-lg shadow-md"
+                  style={{ width: "100%", aspectRatio: "1 / 1" }}
+                >
+                  <button onClick={() => router.push(`/spot/${spot.id}`)}>
+                    {spot.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={spot.image}
+                        alt={spot.spotName}
+                        className="w-full h-full object-cover"
+                        style={{
+                          width: "50vw",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+                  </button>
+                </div>
+              ))}
+            {activeTab === "Saved Spots" &&
+              savedSpots.map((spot) => (
+                <div
+                  key={spot.id}
+                  className="bg-blue-300 rounded-md h-32 flex items-center justify-center"
+                >
+                  <p>{spot.spotName}</p>
+                </div>
+              ))}
+          </div>
         </div>
 
-        {/* Display My Spots or Saved Spots */}
-        <div className="grid grid-cols-3 gap-3">
-          {activeTab === "My Spots" &&
-            mySpots.map((spot) => (
-              <div
-                key={spot.id}
-                className="relative overflow-hidden rounded-lg shadow-md"
-                style={{ width: "100%", aspectRatio: "1 / 1" }}
-              >
-                <button onClick={() => router.push(`/spot/${spot.id}`)}>
-                  {spot.image && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={spot.image}
-                      alt={spot.spotName}
-                      className="w-full h-full object-cover"
-                      style={{
-                        width: "50vw",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  )}
-                </button>
-              </div>
-            ))}
-          {activeTab === "Saved Spots" &&
-            savedSpots.map((spot) => (
-              <div
-                key={spot.id}
-                className="bg-blue-300 rounded-md h-32 flex items-center justify-center"
-              >
-                <p>{spot.spotName}</p>
-              </div>
-            ))}
+        {/* Footer with Log Out Option */}
+        <div className="flex justify-around w-full bg-transparent p-4 mt-auto relative z-10">
+          <a
+            href="https://www.paypal.com/donate/?business=TZ8JDDGWGDFY8&no_recurring=0&item_name=Your+donation+will+directly+support+me+in+solo-developing+this+app+as+well+as+many+more+projects+for+the+people.+Thank+you&currency_code=USD"
+            className="text-black hover:underline"
+          >
+            Donate
+          </a>
+          <a href="/credit" className="text-black hover:underline">
+            Credit
+          </a>
+          <a href="/legal" className="text-black hover:underline">
+            Legal
+          </a>
+          <button onClick={handleLogout} className="text-black hover:underline">
+            Log out
+          </button>
         </div>
       </div>
-
-      {/* Footer with Log Out Option */}
-      <div className="flex justify-around w-full bg-transparent p-4 mt-auto relative z-10">
-        <a
-          href="https://www.paypal.com/donate/?business=TZ8JDDGWGDFY8&no_recurring=0&item_name=Your+donation+will+directly+support+me+in+solo-developing+this+app+as+well+as+many+more+projects+for+the+people.+Thank+you&currency_code=USD"
-          className="text-black hover:underline"
-        >
-          Donate
-        </a>
-        <a href="/credit" className="text-black hover:underline">
-          Credit
-        </a>
-        <a href="/legal" className="text-black hover:underline">
-          Legal
-        </a>
-        <button onClick={handleLogout} className="text-black hover:underline">
-          Log out
-        </button>
-      </div>
-    </div>
-   </ProtectedPage>
+    </ProtectedPage>
   );
 }

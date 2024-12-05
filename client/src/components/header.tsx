@@ -12,8 +12,9 @@ export function Header() {
         width={50}
         height={50}
         onClick={() => (window.location.href = "/home")}
+        
       />
-      <div className="search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md">
+      {/* <div className="search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md">
         <input
           type="text"
           placeholder="Search spots"
@@ -29,8 +30,8 @@ export function Header() {
             className="filter-icon"
           />
         </button>
-      </div>
-      <button>
+      </div> */}
+      {/* <button>
         <Image
           src="/icons/bell.png"
           alt="Notifications"
@@ -38,7 +39,7 @@ export function Header() {
           height={32}
           className="ml-3 mr-1 icon-size"
         />
-      </button>
+      </button> */}
     </header>
   );
 }
