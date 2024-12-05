@@ -119,19 +119,24 @@ export default function CustomMap({ spots }: { spots: Spot[] }) {
     <div style={{ position: "relative" }}>
       <div
         ref={mapRef}
-        style={{ height: "91vh", width: "100%", position: "absolute" }}
+        style={{
+          height: "calc(100vh - 162px)",
+          width: "100%",
+          position: "absolute",
+        }}
+        className="map mt-[82px]"
       ></div>
       <button
         onClick={handleLocateUser}
         style={{
-          position: "relative",
-          bottom: "-77vh",
-          left: "10px",
+          position: "absolute",
           zIndex: 100,
           backgroundColor: "white",
           padding: "10px",
           borderRadius: "50%",
           boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+          top: "74vh",
+          left: "2%",
         }}
       >
         <img

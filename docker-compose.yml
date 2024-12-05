@@ -18,7 +18,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_DATABASE: caligo_db
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: eric
     volumes:
       - mysql_data:/var/lib/mysql # Persistent storage for MySQL database
     ports:
@@ -29,9 +29,13 @@ services:
       context: ./Server
       dockerfile: Dockerfile
     ports:
-      - "3001:3001"
-    env_file:
-      - .env # Use .env for environment variables
+      - "3001:3001" 
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: eric
+      DB_NAME: caligo_db
+      DB_PORT: 3306
     volumes:
       - ./Server/uploads:/app/uploads # Persistent storage for uploaded images in backend
     depends_on:

@@ -42,7 +42,6 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  padding-top: calc(env(safe-area-inset-top) + 0.5rem);
 }
 
 /* Global Heading Styles */
@@ -162,6 +161,10 @@ a {
   a {
     font-size: 1.1rem;
     margin: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+
+  .map {
+    height: 100vh !important;
   }
 
   .navbar {
