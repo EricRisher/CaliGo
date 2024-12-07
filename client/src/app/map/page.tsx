@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Navigation } from "../../components/navbar";
-import { Header } from "../../components/header";
 import { AddSpotForm } from "../../components/addSpotForm"; // Named import
 import ProtectedPage from "@/components/ProtectedPage";
 import dynamic from "next/dynamic";
@@ -66,7 +65,6 @@ export default function MapPage() {
 
   return (
     <div className="relative">
-      <Header />
       {/* Pass fetched spots data to the map component */}
       <CustomMap spots={spots} />
 

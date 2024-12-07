@@ -61,9 +61,10 @@ export default function Home() {
   };
 
   return (
+    
     <div className="flex flex-col min-h-screen">
       {/* Set min-height of screen */}
-      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center min-h-screen p-safe">
+      <main className="flex-grow bg-gradient-to-b from-blue-300 to-orange-200 flex flex-col items-center justify-center text-center">
         {/* Set min-height of screen */}
         <Image
           src="/icons/icon-trans.png"

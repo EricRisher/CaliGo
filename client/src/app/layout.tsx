@@ -62,7 +62,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="manifest" href="/manifest.json" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="theme-color" content="#c3d4ff" />
-        <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
 
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -70,6 +69,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
 
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-title" content="CaliGo" />

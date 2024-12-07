@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Header } from "../components/header";
 
 interface Spot {
   id: number;
@@ -117,14 +118,16 @@ export default function CustomMap({ spots }: { spots: Spot[] }) {
 
   return (
     <div style={{ position: "relative" }}>
+      <Header />
+
       <div
         ref={mapRef}
         style={{
-          height: "calc(100vh - 162px)",
           width: "100%",
           position: "absolute",
+          margin: "auto",
         }}
-        className="map mt-[82px]"
+        className="map"
       ></div>
       <button
         onClick={handleLocateUser}
@@ -135,9 +138,10 @@ export default function CustomMap({ spots }: { spots: Spot[] }) {
           padding: "10px",
           borderRadius: "50%",
           boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          top: "74vh",
+          top: "64vh",
           left: "2%",
         }}
+        className="locate-button"
       >
         <img
           src="/icons/mylocation.png"
