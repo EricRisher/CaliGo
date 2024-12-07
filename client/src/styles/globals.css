@@ -6,7 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --primary-color: 195 212 255;
+  --primary-color: 195, 212, 255;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -129,7 +129,7 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--primary-color);
+  background-color: #c3d4ff;
   padding: 1rem; /* Standard padding for content */
   padding-top: calc(
     env(safe-area-inset-top) + 1rem
