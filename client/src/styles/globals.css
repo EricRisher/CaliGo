@@ -6,7 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --primary-color: 195, 212, 255;
+  --primary-color: 195 212 255;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,14 +39,19 @@
 
 body {
   font-family: "Lora", sans-serif;
-  background-color: #000;
   color: #333;
   line-height: 1.6;
   margin: 0;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: 0;
+  background-color: var(--primary-color); /* Ensures consistent background */
+}
+
+main {
+  padding-top: env(safe-area-inset-top); /* Respect the top inset for notch */
+  padding-bottom: env(
+    safe-area-inset-bottom
+  ); /* Respect the bottom inset for home indicator */
   min-height: 100vh;
-  box-sizing: border-box;
 }
 
 /* Global Heading Styles */
@@ -110,6 +115,7 @@ a {
   justify-content: space-around;
   align-items: center;
   padding: 1rem; /* 16px padding */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
 }
 
 .add-spot-icon {
@@ -126,21 +132,9 @@ a {
 }
 
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #c3d4ff;
-  padding: 1rem; /* Standard padding for content */
-  padding-top: calc(
-    env(safe-area-inset-top) + 1rem
-  ); /* Extend into the safe area for the notch */
+  background-color: var(--primary-color);
+  padding: 1rem;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  transition: transform 0.3s ease;
 }
 
 .sticky-header {

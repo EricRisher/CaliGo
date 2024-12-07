@@ -23,6 +23,15 @@ const config: Config = {
       fontFamily: {
         regular: ["Just-me-again-Down-Here", "sans-serif"],
       },
+      screens: {
+        standalone: { raw: "(display-mode: standalone)" },
+      },
+      padding: {
+        safe: "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
+      },
+      margin: {
+        safe: "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
+      },
     },
   },
   plugins: [],
