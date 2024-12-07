@@ -208,7 +208,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               /> */}
             </button>
           </div>
-          <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
+          <div className=" bg-gray-400 rounded-md mb-2 min-h-[180px] max-h-[500px] overflow-hidden">
             {spot.image && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
