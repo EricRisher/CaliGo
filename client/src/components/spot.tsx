@@ -182,7 +182,7 @@ export function Spots({ spotId }: { spotId?: string }) {
       {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
-          className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
+          className="spot bg-gray-200 rounded-md shadow-md  mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center">
             <div>
@@ -246,11 +246,9 @@ export function Spots({ spotId }: { spotId?: string }) {
               <span>{spot.commentCount || 0}</span>
             </div>
           </div>
-          <div>
-            <p className="m-0 pt-2">
+            <p className="ml-2 pt-2">
               <b>{spot.creator?.username}</b> {spot.description}
             </p>
-          </div>
           <CommentPreview
             comments={
               commentsData[spot.id]?.map((comment) => ({
@@ -270,7 +268,7 @@ export function Spots({ spotId }: { spotId?: string }) {
             }}
             spotId={spot.id}
           />
-          <div className="mt-1 font-normal text-right">
+          <div className="p-2 font-normal text-right">
             {new Date(spot.updatedAt).toLocaleDateString()}
           </div>
         </div>

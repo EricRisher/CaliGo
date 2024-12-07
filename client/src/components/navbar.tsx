@@ -37,8 +37,8 @@ export function Navigation() {
           src="/icons/home.png"
           alt="Home"
           className="icon-size"
-          width={32}
-          height={32}
+          width={44}
+          height={44}
         />
         <span className="hidden md:inline text-sm md:text-lg">Home</span>
       </button>
@@ -50,8 +50,8 @@ export function Navigation() {
           src="/icons/location.png"
           alt="Map"
           className="icon-size"
-          width={32}
-          height={32}
+          width={44}
+          height={44}
         />
         <span className="hidden md:inline text-sm md:text-lg">Map</span>
       </button>
@@ -63,8 +63,8 @@ export function Navigation() {
           src="/icons/plus.png"
           alt="Add"
           className="icon-size"
-          width={48}
-          height={48}
+          width={64}
+          height={64}
         />
         <span className="hidden md:inline text-sm md:text-lg">Add Spot</span>
       </button>
@@ -76,8 +76,8 @@ export function Navigation() {
           src="/icons/bookmark.png"
           alt="Saved"
           className="icon-size"
-          width={32}
-          height={32}
+          width={44}
+          height={44}
         />
         <span className="hidden md:inline text-sm md:text-lg">Saved</span>
       </button>
@@ -89,8 +89,8 @@ export function Navigation() {
           src="/icons/user.png"
           alt="Profile"
           className="icon-size"
-          width={32}
-          height={32}
+          width={44}
+          height={44}
         />
         <span className="hidden md:inline text-sm md:text-lg">Profile</span>
       </button>

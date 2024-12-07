@@ -64,7 +64,7 @@ export function CommentPreview({
 
   return (
     <div>
-      <button onClick={handleViewAllComments} className="hover:underline mt-2">
+      <button onClick={handleViewAllComments} className="hover:underline ml-2">
         {showAllComments ? "Close Comments" : "View All Comments"}
       </button>
 

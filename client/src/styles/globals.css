@@ -6,7 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --primary-color: 195 212 255;
+  --primary-color: 195, 212, 255;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,7 +43,7 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: var(--primary-color); /* Ensures consistent background */
+  background-color: #c3d4ff; /* Ensures consistent background */
 }
 
 main {
@@ -135,6 +135,7 @@ a {
   background-color: var(--primary-color);
   padding: 1rem;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding-top: calc(1rem + var(safe-area-inset-top));
 }
 
 .sticky-header {
@@ -251,7 +252,7 @@ a {
   }
 
   p {
-    font-size: 0.8rem;
+    font-size: 1rem;
     margin: 0.5rem 0.5rem 1rem 0.5rem;
   }
 
@@ -324,10 +325,6 @@ button {
 
 .btn-primary:focus {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(195, 212, 255, 0.7);
-}
-
-.leaflet-control-container .leaflet-top.leaflet-left {
-  top: 100px;
 }
 
 .progress-bar {

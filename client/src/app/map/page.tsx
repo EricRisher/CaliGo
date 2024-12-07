@@ -7,6 +7,7 @@ import { AddSpotForm } from "../../components/addSpotForm"; // Named import
 import ProtectedPage from "@/components/ProtectedPage";
 import dynamic from "next/dynamic";
 import axios from "axios";
+import Head from "next/head";
 
 // Define the Spot interface that matches your Sequelize model
 interface Spot {
@@ -64,20 +65,27 @@ export default function MapPage() {
   }, [pathname]);
 
   return (
-    <div className="relative">
-      {/* Pass fetched spots data to the map component */}
-      <CustomMap spots={spots} />
+    <>
+      <Head>
+        <title>CaliGo - Map</title>
+        <meta name="description" content="Map page" />
+        <meta name="apple-mobile-web-app-bar-style" content="black" />
+      </Head>
+      <div className="relative bg-[#c3d4ff]">
+        {/* Pass fetched spots data to the map component */}
+        <CustomMap spots={spots} />
 
-      <div
-        className={`fixed inset-x-0 bottom-0 bg-white p-4 shadow-lg transition-transform duration-300 z-[150] ${
-          showForm ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{ maxHeight: "80vh", overflowY: "auto" }}
-      >
-        <AddSpotForm closeForm={() => setShowForm(false)} />
+        <div
+          className={`fixed inset-x-0 bottom-0 bg-white p-4 shadow-lg transition-transform duration-300 z-[150] ${
+            showForm ? "translate-y-0" : "translate-y-full"
+          }`}
+          style={{ maxHeight: "80vh", overflowY: "auto" }}
+        >
+          <AddSpotForm closeForm={() => setShowForm(false)} />
+        </div>
+
+        <Navigation />
       </div>
-
-      <Navigation />
-    </div>
+    </>
   );
 }
