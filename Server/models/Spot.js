@@ -23,7 +23,7 @@ Spot.init(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [1, 300],
+        len: [1, 500],
       },
     },
     latitude: {

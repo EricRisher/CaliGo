@@ -7,6 +7,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const [spotDescription, setSpotDescription] = useState("");
   const [spotCoordinates, setSpotCoordinates] = useState(""); // Combined lat, long input
   const [image, setImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to track submission
 
   // Handle file input change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +20,11 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
+    setIsSubmitting(true); // Set submission state
+
     // Validate location format: "latitude, longitude"
     const coords = spotCoordinates
       .split(",")
@@ -29,6 +35,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
       isNaN(Number(coords[1]))
     ) {
       alert("Please enter location in 'latitude, longitude' format.");
+      setIsSubmitting(false); // Reset submission state on error
       return;
     }
 
@@ -68,6 +75,8 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("An error occurred while adding the spot.");
+    } finally {
+      setIsSubmitting(false); // Reset submission state after completion
     }
   };
 
@@ -138,9 +147,12 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
         </div>
         <button
           type="submit"
-          className="bg-secondary text-white py-2 px-4 rounded-lg"
+          className={`bg-secondary text-white py-2 px-4 rounded-lg ${
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={isSubmitting} // Disable button while submitting
         >
-          Submit
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>

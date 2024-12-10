@@ -134,6 +134,13 @@ a {
   transition: transform 1s ease, opacity 1s ease;
 }
 
+.hero-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 1rem;
+  margin: 1rem;
+}
+
 .sticky-header {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -258,6 +265,13 @@ a {
     font-size: 1rem;
     margin: 0.5rem 0.5rem 1rem 0.5rem;
   }
+}
+
+@media screen and (max-width: 768px) {
+ .hero-images {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    max-width: 95vw;
+ }
 }
 
 .btn-primary {
