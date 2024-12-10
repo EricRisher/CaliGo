@@ -18,7 +18,7 @@ interface CustomMapProps {
 export default function CustomMap({ spots, className }: CustomMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [userMarker, setUserMarker] = useState<google.maps.marker.AdvancedMarkerClickEvent | null>(null);
+  const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !map) {
@@ -90,30 +90,29 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
     }
   }, [map, spots]);
 
+  const updateUserMarker = (latitude: number, longitude: number) => {
+    const userLatLng = new google.maps.LatLng(latitude, longitude);
+    map?.setCenter(userLatLng);
+    map?.setZoom(13);
+
+    if (userMarker) {
+      userMarker.setPosition(userLatLng);
+    } else {
+      const newMarker = new google.maps.Marker({
+        position: userLatLng,
+        map,
+        title: "You are here",
+      });
+      setUserMarker(newMarker);
+    }
+  };
+
   // Locate User and Add Marker
   const handleLocateUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const userLatLng = new google.maps.LatLng(latitude, longitude);
-          map?.setCenter(userLatLng);
-          map?.setZoom(13);
-
-          if (userMarker) {
-            userMarker.setPosition(userLatLng);
-          } else {
-            const newMarker = new google.maps.Marker({
-              position: userLatLng,
-              map: map,
-              title: "You are here",
-            });
-            setUserMarker(newMarker);
-          }
-        },
-        () => {
-          alert("Unable to retrieve your location");
-        }
+        ({ coords }) => updateUserMarker(coords.latitude, coords.longitude),
+        () => alert("Unable to retrieve your location")
       );
     } else {
       alert("Geolocation is not supported by your browser");
