@@ -123,7 +123,7 @@ export default function Home() {
             </div>
           )}
           {/* Hero Images */}
-          <div className="text-left pl-8">
+          <div className="text-left hero-text">
             <h2 className="mt-20">Explore. &nbsp; Share. &nbsp; Inspire.</h2>
             <h3 className="text-1xl tracking-wider">
               Over{" "}

@@ -234,6 +234,10 @@ a {
   .spot {
     width: 30rem;
   }
+  
+  .hero-text {
+    padding-left: 4rem;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -268,16 +272,19 @@ a {
 }
 
 @media screen and (max-width: 768px) {
- .hero-images {
+  .hero-images {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
     max-width: 90vw;
- }
- h3 {
-  font-size: 1rem;
- }
- h3 > span {
-  font-size: 0.8rem;
- }
+  }
+  h3 {
+    font-size: 1rem;
+  }
+  h3 > span {
+    font-size: 0.8rem;
+  }
+  .hero-text {
+    padding-left: 1rem;
+  }
 }
 
 .btn-primary {
