@@ -29,6 +29,7 @@ interface Spot {
   commentCount?: number;
   likes: number;
   userLiked: boolean;
+  userSaved: boolean; // Added field for bookmark state
   updatedAt: string;
   creator: User;
 }
@@ -38,19 +39,15 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [spotsData, setSpotsData] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState<{ [id: number]: boolean }>({});
+  const [savedPosts, setSavedPosts] = useState<{ [id: number]: boolean }>({});
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const [bookmarkedPosts, setBookmarkedPosts] = useState<{
-    [id: number]: boolean;
-  }>({});
-  const [commentsData, setCommentsData] = useState<{ [id: number]: Comment[] }>(
-    {}
-  );
   const [username, setUsername] = useState<string | null>(null);
-  const [mySpots, setMySpots] = useState<Spot[]>([]);
-  const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeCommentSpot, setActiveCommentSpot] = useState<number | null>(
+    null
+  );
 
-  // Function to fetch city name from coordinates using Google Maps Geocoding API
+  // Fetch city name from coordinates using Google Maps Geocoding API
   const fetchCityFromCoordinates = async (
     latitude: number,
     longitude: number
@@ -103,7 +100,7 @@ export function Spots({ spotId }: { spotId?: string }) {
 
       setSpotsData(spotsWithCity);
 
-      // Map initial liked states
+      // Map initial liked and saved states
       const initialLikedPosts = spotsWithCity.reduce(
         (acc: { [id: number]: boolean }, spot: Spot) => {
           acc[spot.id] = spot.userLiked;
@@ -112,7 +109,16 @@ export function Spots({ spotId }: { spotId?: string }) {
         {}
       );
 
-      setLikedPosts(initialLikedPosts); // Update the likedPosts state
+      const initialSavedPosts = spotsWithCity.reduce(
+        (acc: { [id: number]: boolean }, spot: Spot) => {
+          acc[spot.id] = spot.userSaved;
+          return acc;
+        },
+        {}
+      );
+
+      setLikedPosts(initialLikedPosts);
+      setSavedPosts(initialSavedPosts);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching spots:", error);
@@ -130,9 +136,7 @@ export function Spots({ spotId }: { spotId?: string }) {
       if (response.ok) {
         const user = await response.json();
         setUsername(user.username);
-        setMySpots(user.mySpots || []);
-        setSavedSpots(user.savedSpots || []);
-        setProfilePicture(user.profilePicture || "/icons/user.png"); // Default if not set
+        setProfilePicture(user.profilePicture || "/icons/user.png");
         setIsLoggedIn(true);
       } else {
         console.error("Invalid token or session expired");
@@ -169,6 +173,34 @@ export function Spots({ spotId }: { spotId?: string }) {
     }
   };
 
+  const toggleSave = async (spotId: number) => {
+    const isSaved = savedPosts[spotId];
+    const url = `${apiUrl}/spots/${spotId}/${isSaved ? "unsave" : "save"}`;
+
+    try {
+      setSavedPosts((prev) => ({ ...prev, [spotId]: !isSaved }));
+      const response = await fetch(url, {
+        method: isSaved ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        console.error("Failed to toggle save:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error toggling save:", error);
+    }
+  };
+
+  const openCommentPopup = (spotId: number) => {
+    setActiveCommentSpot(spotId);
+  };
+
+  const closeCommentPopup = () => {
+    setActiveCommentSpot(null);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -197,20 +229,9 @@ export function Spots({ spotId }: { spotId?: string }) {
                 </a>
               </p>
             </div>
-
-            <button>
-              {/* <img
-                src={profilePicture || "/icons/user.png"}
-                alt="Profile"
-                width={48}
-                height={48}
-                className="rounded-full"
-              /> */}
-            </button>
           </div>
-          <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
+          <div className="bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={spot.image}
                 alt={spot.spotName}
@@ -235,7 +256,7 @@ export function Spots({ spotId }: { spotId?: string }) {
                 />
               </button>
               <span>{spot.likes}</span>
-              <button>
+              <button onClick={() => openCommentPopup(spot.id)}>
                 <Image
                   src="/icons/chat-box.png"
                   alt="Comment"
@@ -245,28 +266,30 @@ export function Spots({ spotId }: { spotId?: string }) {
               </button>
               <span>{spot.commentCount || 0}</span>
             </div>
+            <div>
+              <button onClick={() => toggleSave(spot.id)}>
+                <Image
+                  src={
+                    savedPosts[spot.id]
+                      ? "/icons/bookmark-filled.png"
+                      : "/icons/bookmark.png"
+                  }
+                  alt="Save"
+                  width={32}
+                  height={32}
+                />
+              </button>
+            </div>
           </div>
-          <div>
-            <p className="m-0 pt-2">
-              <b>{spot.creator?.username}</b> {spot.description}
-            </p>
-          </div>
+          <p className="m-0 pt-2">
+            <b>{spot.creator?.username}</b> {spot.description}
+          </p>
           <CommentPreview
-            comments={
-              commentsData[spot.id]?.map((comment) => ({
-                commentText: comment.commentText,
-                username: comment.commentAuthor?.username || "Anonymous",
-              })) || []
-            }
+            comments={[]}
             onFetchComments={async () => {
               const response = await fetch(`${apiUrl}/comments/${spot.id}`);
               const fetchedComments = await response.json();
-              return Array.isArray(fetchedComments)
-                ? fetchedComments.map((comment: Comment) => ({
-                    commentText: comment.commentText,
-                    username: comment.commentAuthor?.username || "Anonymous",
-                  }))
-                : [];
+              return Array.isArray(fetchedComments) ? fetchedComments : [];
             }}
             spotId={spot.id}
           />

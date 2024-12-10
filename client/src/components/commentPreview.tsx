@@ -69,7 +69,7 @@ export function CommentPreview({
       </button>
 
       {showAllComments && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-end mb-[92px]">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-end mb-[80px]">
           <div className="bg-white rounded-t-lg max-h-[80%] w-full flex flex-col">
             <div className="sticky top-0 p-4 bg-white z-10 border-b">
               <button

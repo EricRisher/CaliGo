@@ -10,7 +10,12 @@ interface Spot {
   image: string;
 }
 
-export default function CustomMap({ spots }: { spots: Spot[] }) {
+interface CustomMapProps {
+  spots: Spot[];
+  className?: string; // Add an optional className prop
+}
+
+export default function CustomMap({ spots, className }: CustomMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
@@ -56,7 +61,7 @@ export default function CustomMap({ spots }: { spots: Spot[] }) {
 
       const newMap = new google.maps.Map(mapRef.current, {
         center: { lat: 34.0522, lng: -118.2437 },
-        zoom: 10,
+        zoom: 8,
         mapTypeId: "hybrid",
         styles: mapStyle, // Apply the custom style here
       });
@@ -116,15 +121,14 @@ export default function CustomMap({ spots }: { spots: Spot[] }) {
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="relative">
       <div
         ref={mapRef}
+        className={`map mt-[82px] ${className || ""}`}
         style={{
-          height: "calc(100vh - 162px)",
           width: "100%",
           position: "absolute",
         }}
-        className="map mt-[82px]"
       ></div>
       <button
         onClick={handleLocateUser}

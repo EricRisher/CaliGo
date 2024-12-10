@@ -31,6 +31,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+router.get("/spot-count", async (req, res) => {
+  try {
+    const count = await Spot.count();
+    res.json({ total: count });
+  } catch (error) {
+    console.error("Error fetching spot count:", error);
+    res.status(500).json({ error: "Failed to fetch spot count" });
+  }
+});
+
 // Create a new spot (Protected Route)
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
@@ -258,6 +268,48 @@ router.delete("/:spotId/unlike", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error unliking post:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Save a spot (bookmark) (Protected Route)
+router.post("/:spotId/save", authMiddleware, async (req, res) => {
+  const { spotId } = req.params;
+  const userId = req.user?.id;
+
+  try {
+    const existingSave = await SavedSpot.findOne({ where: { userId, spotId } });
+
+    if (existingSave) {
+      return res.status(400).json({ message: "Spot already saved" });
+    }
+
+    await SavedSpot.create({ userId, spotId });
+
+    res.status(201).json({ message: "Spot saved successfully" });
+  } catch (error) {
+    console.error("Error saving spot:", error);
+    res.status(500).json({ message: "Failed to save spot" });
+  }
+});
+
+// Remove a saved spot (Protected Route)
+router.delete("/:spotId/save", authMiddleware, async (req, res) => {
+  const { spotId } = req.params;
+  const userId = req.user?.id;
+
+  try {
+    const savedSpot = await SavedSpot.findOne({ where: { userId, spotId } });
+
+    if (!savedSpot) {
+      return res.status(400).json({ message: "Spot not saved" });
+    }
+
+    await savedSpot.destroy();
+
+    res.status(200).json({ message: "Spot removed from saved spots" });
+  } catch (error) {
+    console.error("Error removing saved spot:", error);
+    res.status(500).json({ message: "Failed to remove saved spot" });
   }
 });
 

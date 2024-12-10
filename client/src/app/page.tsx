@@ -5,11 +5,19 @@ import Image from "next/image";
 import Button from "../components/button";
 import ArrowCircleRightOutlinedIcon from "@mui/icons-material/ArrowCircleRightOutlined";
 
+interface Spot {
+  id: number;
+  spotName: string;
+  latitude: number;
+  longitude: number;
+  image: string;
+}
+
 export default function Home() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [isIos, setIsIos] = useState(false);
-  const [showIosInstructions, setShowIosInstructions] = useState(false);
+  const [spotCount, setSpotCount] = useState(0);
 
   // Handle "beforeinstallprompt" event
   useEffect(() => {
@@ -40,6 +48,23 @@ export default function Home() {
       );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
+  }, []);
+
+  useEffect(() => {
+    // Fetch spot count from the backend
+    const fetchSpotCount = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await fetch(`${apiUrl}/spots/spot-count`); // Adjust the URL to match your API endpoin
+
+        const data = await response.json();
+        setSpotCount(data.total); // Update state with the count
+      } catch (error) {
+        console.error("Error fetching spot count:", error);
+      }
+    };
+
+    fetchSpotCount();
   }, []);
 
   const installPWA = async () => {
@@ -74,22 +99,20 @@ export default function Home() {
         />
         <section className="max-w-90 m-4">
           <h1 className="mb-4">Discover the West Coast like never before!</h1>
-          <p className="mb-6 text-left">
-            You’re about to embark on a journey to uncover hidden gems and
-            explore breathtaking spots with a community of like-minded
-            explorers.
+          <p className="mb-6 text-lg">
+            Embark on a journey to uncover hidden gems, explore breathtaking
+            locations, and connect with fellow adventurers who share your
+            passion for discovery.
           </p>
           <Button onClick={login}>
-            Join the Adventure <ArrowCircleRightOutlinedIcon />
+            Start Exploring Now <ArrowCircleRightOutlinedIcon />
           </Button>
-
           {/* Custom Install Button */}
           {showInstallButton && (
             <Button onClick={installPWA} className="mt-4">
               Install App
             </Button>
           )}
-
           {/* iOS Instructions */}
           {isIos && (
             <div className="mt-4">
@@ -99,20 +122,62 @@ export default function Home() {
               </p>
             </div>
           )}
+          {/* Hero Images */}
+          <div className="text-left pl-8">
+            <h2 className="mt-20">Explore. &nbsp; Share. &nbsp; Inspire.</h2>
+            <h3 className="text-1xl tracking-wider">
+              Over{" "}
+              <span className="text-4xl font-bold text-black">{spotCount}</span>{" "}
+              incredible spots shared by our community!
+            </h3>
+          </div>
+          <section className="flex flex-row flex-wrap justify-evenly">
+            <Image
+              src={"/images/caligo.site_home (1).png"}
+              alt="CaliGo"
+              width={400}
+              height={300}
+              className="rounded-lg hero-images"
+            />
+            <Image
+              src={"/images/caligo.site_home (2).png"}
+              alt="CaliGo"
+              width={400}
+              height={300}
+              className="rounded-lg hero-images"
+            />
+            <Image
+              src={"/images/caligo.site_home.png"}
+              alt="CaliGo"
+              width={400}
+              height={300}
+              className="rounded-lg hero-images"
+            />
+            <Image
+              src={"/images/caligo.site_home (3).png"}
+              alt="CaliGo"
+              width={400}
+              height={300}
+              className="rounded-lg hero-images"
+            />
+          </section>
         </section>
-        <footer className="flex justify-evenly items-center w-full bg-transparent mt-auto p-4">
-          <a href="/legal" className="hover:underline">
-            Legal
-          </a>
-          <a
-            href="https://github.com/EricRisher/CaliGo"
-            className="hover:underline"
-          >
-            v2.5
-          </a>
-          <a href="https://www.ericrisher.com" className="hover:underline">
-            by <b>Eric Risher</b>
-          </a>
+        <footer className="relative flex justify-evenly items-center w-full bg-transparent mt-auto p-4 flex-col">
+          <h5>CaliGo - Your Adventure Starts Here</h5>
+          <div>
+            <a href="/legal" className="hover:underline">
+              Legal
+            </a>
+            <a
+              href="https://github.com/EricRisher/CaliGo"
+              className="hover:underline"
+            >
+              Version 2.5
+            </a>
+            <a href="https://www.ericrisher.com" className="hover:underline">
+              by <b>Eric Risher</b>
+            </a>
+          </div>
         </footer>
       </main>
     </div>
