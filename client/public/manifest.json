@@ -1,8 +1,8 @@
 {
-  "name": "CaliGo",
+  "name": "CaliGo - Explore Hidden Spots",
   "short_name": "CaliGo",
-  "theme_color": "#00ff00",
-  "background_color": "#ffffff",
+  "theme_color": "#c3d4ff",
+  "background_color": "#c3d4ff",
   "display": "standalone",
   "orientation": "natural",
   "scope": "/",

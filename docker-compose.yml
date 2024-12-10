@@ -39,7 +39,7 @@ services:
 
   mysql:
     restart: unless-stopped
-    image: mysql:8.0
+     image: mysql:8.0
     networks:
       - caligo_network
     env_file:
