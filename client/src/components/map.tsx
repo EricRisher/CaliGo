@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
 
 interface Spot {
   id: number;
@@ -20,42 +21,27 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
 
+  // Initialize the map
   useEffect(() => {
     if (mapRef.current && !map) {
       const mapStyle = [
         {
           featureType: "administrative",
           elementType: "geometry",
-          stylers: [
-            {
-              visibility: "off",
-            },
-          ],
+          stylers: [{ visibility: "off" }],
         },
         {
           featureType: "poi",
-          stylers: [
-            {
-              visibility: "off",
-            },
-          ],
+          stylers: [{ visibility: "off" }],
         },
         {
           featureType: "road",
           elementType: "labels.icon",
-          stylers: [
-            {
-              visibility: "off",
-            },
-          ],
+          stylers: [{ visibility: "off" }],
         },
         {
           featureType: "transit",
-          stylers: [
-            {
-              visibility: "off",
-            },
-          ],
+          stylers: [{ visibility: "off" }],
         },
       ];
 
@@ -63,17 +49,17 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         center: { lat: 34.0522, lng: -118.2437 },
         zoom: 8,
         mapTypeId: "hybrid",
-        styles: mapStyle, // Apply the custom style here
+        styles: mapStyle,
       });
       setMap(newMap);
     }
   }, [map]);
 
-  // Add Spots to Map
+  // Add spots to the map
   useEffect(() => {
     if (map) {
       spots.forEach((spot) => {
-        const marker = new google.maps.marker.AdvancedMarkerElement({
+        const marker = new google.maps.Marker({
           position: { lat: spot.latitude, lng: spot.longitude },
           map: map,
           title: spot.spotName,
@@ -90,24 +76,28 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
     }
   }, [map, spots]);
 
-  const updateUserMarker = (latitude: number, longitude: number) => {
-    const userLatLng = new google.maps.LatLng(latitude, longitude);
-    map?.setCenter(userLatLng);
-    map?.setZoom(13);
+  // Update or create user marker
+  const updateUserMarker = useCallback(
+    (latitude: number, longitude: number) => {
+      const userLatLng = new google.maps.LatLng(latitude, longitude);
+      map?.setCenter(userLatLng);
+      map?.setZoom(13);
 
-    if (userMarker) {
-      userMarker.setPosition(userLatLng);
-    } else {
-      const newMarker = new google.maps.Marker({
-        position: userLatLng,
-        map,
-        title: "You are here",
-      });
-      setUserMarker(newMarker);
-    }
-  };
+      if (userMarker) {
+        userMarker.setPosition(userLatLng);
+      } else {
+        const newMarker = new google.maps.Marker({
+          position: userLatLng,
+          map,
+          title: "You are here",
+        });
+        setUserMarker(newMarker);
+      }
+    },
+    [map, userMarker]
+  );
 
-  // Locate User and Add Marker
+  // Locate user and update marker
   const handleLocateUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -126,6 +116,7 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         className={`map mt-[82px] ${className || ""}`}
         style={{
           width: "100%",
+          height: "100%",
           position: "absolute",
         }}
       ></div>
@@ -142,11 +133,12 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
           left: "2%",
         }}
       >
-        <img
+        <Image
           src="/icons/mylocation.png"
           alt="Locate Me"
           width={32}
           height={32}
+          priority
         />
       </button>
     </div>
