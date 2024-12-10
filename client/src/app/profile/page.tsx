@@ -146,7 +146,7 @@ function ProfileContent() {
       </div> */}
 
         {/* Tabs for My Spots and Saved Spots */}
-        <div className="w-full px-4 relative z-10 bg-slate-300 h-[80vh]">
+        <div className="w-full px-4 relative z-10 bg-slate-300 h-[70vh]">
           <div className="flex space-x-4 m-4 ">
             <button
               className={`py-2 px-4 rounded-lg ${

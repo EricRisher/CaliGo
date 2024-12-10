@@ -1,26 +1,42 @@
-Checklist:
-- Login as Guest
-- Donation button
-- Make map points show real db data
-- Add user profile pics, and a bio. Must have to engage with community.
-- Make xp leveling up work per user post/comment; +1xp per comment, +10xp per spot, +1xp per total spot likes
-- Add saved posts functionality
-- Update spots to take up entire width of page, force fullscreen for mobile users.
-- Add login with google button
-- Add forgot password functionality
-- Add notifications
-- Implement search and filter
-- Dark mode?
+# Caligo
 
-When users are logged in they should be able to: 
-- Comment on posts 
-- Like posts
-- Add posts to their saved spots
-- Upload their own posts
-- Everything else
+Discover hidden gems in your city with **Caligo**, a progressive web app designed to help users explore unique locations and experiences. Built with modern web technologies, Caligo provides a sleek, responsive interface that ensures a seamless experience across all devices.
 
-When users are viewing as a guest they aren't able to:
-- Use the search bar (greyed out)
-- Like, Comment or save posts
-- View their profile (when clicked routes user to signup page)
-- 
+---
+
+## Description
+
+Caligo is a community-driven platform where users can find and share hidden gems—places and experiences off the beaten path. Whether it’s a cozy café, an art gallery, or a scenic hiking trail, Caligo helps users uncover the best their city has to offer. With features like location-based discovery and interactive maps, Caligo makes exploration fun and effortless.
+
+---
+
+## Features
+
+- **User-Generated Content**: Share your favorite hidden gems with others.
+- **Interactive Maps**: Discover locations using a dynamic, responsive map interface.
+- **Responsive Design**: Fully optimized for mobile, tablet, and desktop.
+- **User Profiles**: Save and share your favorite spots.
+- **SEO Optimization**: Built to rank well on search engines, attracting more users.
+- **Progressive Web App**: Installable on mobile devices for a native-like experience.
+
+---
+
+## Technologies Used
+
+- **Frontend**: [Next.js](https://nextjs.org/), TypeScript, TailwindCSS
+- **Backend**: Express.js, MySQL
+- **Mapping**: Google Maps API
+- **State Management**: React Context
+- **Authentication**: JSON Web Tokens (JWT)
+- **Deployment**: Docker, Ubuntu Server, Apache2
+
+---
+
+## Installation
+
+To run the project locally, follow these steps:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/caligo.git
+   cd caligo

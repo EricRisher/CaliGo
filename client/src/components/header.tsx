@@ -10,7 +10,7 @@ export function Header() {
     const handleScroll = () => {
       // Capture the current scroll position
       const scrollY = window.scrollY;
-      setScrollPosition(scrollY > 100 ? 100 : scrollY); // Limit the effect to the first 100px of scroll
+      setScrollPosition(scrollY); // Allow the header to scroll fully out
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -20,15 +20,13 @@ export function Header() {
     };
   }, []);
 
-  // Calculate dynamic styles based on scroll position
-  const opacity = 1 - scrollPosition / 100; // Fades out as you scroll
-  const transform = `translateY(-${scrollPosition / 2}px)`; // Moves up slightly
+  // Adjust transform based on scroll position, moving fully out of view
+  const transform = `translateY(-${Math.min(scrollPosition, 100)}%)`;
 
   return (
     <header
       className="header bg-primary sticky-header"
       style={{
-        opacity, // Dynamic opacity
         transform, // Dynamic transform
       }}
     >
@@ -40,6 +38,7 @@ export function Header() {
         height={50}
         onClick={() => (window.location.href = "/home")}
       />
+      {/* Uncomment these if needed */}
       {/* <div className="search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md">
         <input
           type="text"

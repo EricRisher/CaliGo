@@ -1,5 +1,9 @@
 version: "3.8"
 
+networks:
+  caligo_network:
+    driver: bridge
+
 services:
   frontend:
     build:
@@ -7,39 +11,37 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    env_file:
-      - .env # Use .env for environment variables
+    volumes:
+      - /srv/CaliGo/data/frontend_cache:/app/.next/cache
     depends_on:
       - backend
-    volumes:
-      - ./client/public:/app/public # Map the frontend public folder for static assets
-
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: caligo_db
-      MYSQL_ROOT_PASSWORD: eric
-    volumes:
-      - mysql_data:/var/lib/mysql # Persistent storage for MySQL database
-    ports:
-      - "3307:3306"
+    networks:
+      - caligo_network
+    env_file:
+      - .env # Load environment variables from .env file
 
   backend:
     build:
       context: ./Server
       dockerfile: Dockerfile
     ports:
-      - "3001:3001" 
-    environment:
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: eric
-      DB_NAME: caligo_db
-      DB_PORT: 3306
-    volumes:
-      - ./Server/uploads:/app/uploads # Persistent storage for uploaded images in backend
+      - "3001:3001"
     depends_on:
       - mysql
+    networks:
+      - caligo_network
+    env_file:
+      - .env # Load environment variables from .env file
+    volumes:
+      - /srv/CaliGo/data/uploads:/app/uploads # Persistent storage for user uploads
 
-volumes:
-  mysql_data: # Persistent storage for MySQL data
+  mysql:
+    image: mysql:8.0
+    networks:
+      - caligo_network
+    env_file:
+      - .env # Load environment variables from .env file
+    volumes:
+      - /srv/CaliGo/data/mysql:/var/lib/mysql # Persistent storage for MySQL data
+    ports:
+      - "3306:3306"
