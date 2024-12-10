@@ -270,7 +270,13 @@ a {
 @media screen and (max-width: 768px) {
  .hero-images {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    max-width: 95vw;
+    max-width: 90vw;
+ }
+ h3 {
+  font-size: 1rem;
+ }
+ h3 > span {
+  font-size: 0.8rem;
  }
 }
 
