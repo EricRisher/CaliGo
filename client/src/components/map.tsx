@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 interface Spot {
   id: number;
@@ -21,27 +20,42 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
 
-  // Initialize the map
   useEffect(() => {
     if (mapRef.current && !map) {
       const mapStyle = [
         {
           featureType: "administrative",
           elementType: "geometry",
-          stylers: [{ visibility: "off" }],
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
         },
         {
           featureType: "poi",
-          stylers: [{ visibility: "off" }],
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
         },
         {
           featureType: "road",
           elementType: "labels.icon",
-          stylers: [{ visibility: "off" }],
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
         },
         {
           featureType: "transit",
-          stylers: [{ visibility: "off" }],
+          stylers: [
+            {
+              visibility: "off",
+            },
+          ],
         },
       ];
 
@@ -49,19 +63,19 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         center: { lat: 34.0522, lng: -118.2437 },
         zoom: 8,
         mapTypeId: "hybrid",
-        styles: mapStyle,
+        styles: mapStyle, // Apply the custom style here
       });
       setMap(newMap);
     }
   }, [map]);
 
-  // Add spots to the map
+  // Add Spots to Map
   useEffect(() => {
     if (map) {
       spots.forEach((spot) => {
         const marker = new google.maps.Marker({
           position: { lat: spot.latitude, lng: spot.longitude },
-          map,
+          map: map,
           title: spot.spotName,
         });
 
@@ -76,32 +90,30 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
     }
   }, [map, spots]);
 
-  // Update or create user marker
-  const updateUserMarker = useCallback(
-    (latitude: number, longitude: number) => {
-      const userLatLng = new google.maps.LatLng(latitude, longitude);
-      map?.setCenter(userLatLng);
-      map?.setZoom(13);
-
-      if (userMarker) {
-        userMarker.setPosition(userLatLng);
-      } else {
-        const newMarker = new google.maps.marker.AdvancedMarkerElement({
-          position: userLatLng,
-          map,
-          title: "You are here",
-        });
-      }
-    },
-    [map, userMarker]
-  );
-
-  // Locate user and update marker
+  // Locate User and Add Marker
   const handleLocateUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        ({ coords }) => updateUserMarker(coords.latitude, coords.longitude),
-        () => alert("Unable to retrieve your location")
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const userLatLng = new google.maps.LatLng(latitude, longitude);
+          map?.setCenter(userLatLng);
+          map?.setZoom(13);
+
+          if (userMarker) {
+            userMarker.setPosition(userLatLng);
+          } else {
+            const newMarker = new google.maps.Marker({
+              position: userLatLng,
+              map: map,
+              title: "You are here",
+            });
+            setUserMarker(newMarker);
+          }
+        },
+        () => {
+          alert("Unable to retrieve your location");
+        }
       );
     } else {
       alert("Geolocation is not supported by your browser");
@@ -115,7 +127,6 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         className={`map mt-[82px] ${className || ""}`}
         style={{
           width: "100%",
-          height: "100%",
           position: "absolute",
         }}
       ></div>
@@ -132,12 +143,11 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
           left: "2%",
         }}
       >
-        <Image
+        <img
           src="/icons/mylocation.png"
           alt="Locate Me"
           width={32}
           height={32}
-          priority
         />
       </button>
     </div>
