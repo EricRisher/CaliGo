@@ -43,9 +43,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           crossOrigin="anonymous"
         ></script>
         <script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           async
           defer
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         ></script>
 
         <meta name="msapplication-TileColor" content="#2b5797" />

@@ -59,7 +59,7 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
   useEffect(() => {
     if (map) {
       spots.forEach((spot) => {
-        const marker = new google.maps.Marker({
+        const marker = new google.maps.marker.AdvancedMarkerElement({
           position: { lat: spot.latitude, lng: spot.longitude },
           map: map,
           title: spot.spotName,
@@ -86,12 +86,11 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
       if (userMarker) {
         userMarker.setPosition(userLatLng);
       } else {
-        const newMarker = new google.maps.Marker({
+        const newMarker = new google.maps.marker.AdvancedMarkerElement({
           position: userLatLng,
           map,
           title: "You are here",
         });
-        setUserMarker(newMarker);
       }
     },
     [map, userMarker]
