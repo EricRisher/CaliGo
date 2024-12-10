@@ -18,7 +18,7 @@ interface CustomMapProps {
 export default function CustomMap({ spots, className }: CustomMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
+  const [userMarker, setUserMarker] = useState<google.maps.marker.AdvancedMarkerClickEvent | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !map) {
@@ -73,7 +73,7 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
   useEffect(() => {
     if (map) {
       spots.forEach((spot) => {
-        const marker = new google.maps.Marker({
+        const marker = new google.maps.marker.AdvancedMarkerElement({
           position: { lat: spot.latitude, lng: spot.longitude },
           map: map,
           title: spot.spotName,

@@ -45,6 +45,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <script
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFRCc3XYfsr71Rujcut54ZHHdYkrnxWas&libraries=places"
           async
+          defer
         ></script>
         <meta name="msapplication-TileColor" content="#2b5797" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
