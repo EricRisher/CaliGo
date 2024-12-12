@@ -74,7 +74,7 @@ export default function MapPage() {
         className={`fixed inset-x-0 bottom-0 bg-white p-4 shadow-lg transition-transform duration-300 z-[150] ${
           showForm ? "translate-y-0" : "translate-y-full"
         }`}
-        style={{ maxHeight: "80vh", overflowY: "auto" }}
+        style={{ maxHeight: "100vh", overflowY: "auto" }}
       >
         <AddSpotForm closeForm={() => setShowForm(false)} />
       </div>

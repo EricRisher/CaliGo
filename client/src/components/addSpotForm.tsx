@@ -7,12 +7,18 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const [spotDescription, setSpotDescription] = useState("");
   const [spotCoordinates, setSpotCoordinates] = useState(""); // Combined lat, long input
   const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // For preview
   const [isSubmitting, setIsSubmitting] = useState(false); // State to track submission
 
   // Handle file input change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      const selectedImage = e.target.files[0];
+      setImage(selectedImage);
+
+      // Generate a preview URL
+      const previewUrl = URL.createObjectURL(selectedImage);
+      setImagePreview(previewUrl);
     }
   };
 
@@ -95,7 +101,8 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
         <h2 className="m-0">Add a Spot!</h2>
       </div>
       <p className="text-gray-600">
-        Fill out the form below to add a new spot to the map.
+        Fill out the form below to add a new spot to the map. All fields are
+        required
       </p>
       <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
         <div>
@@ -108,18 +115,6 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
             required
             value={spotName}
             onChange={(e) => setSpotName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="spotDescription">Description:</label>
-          <input
-            type="text"
-            id="spotDescription"
-            name="spotDescription"
-            className="border border-gray-300 rounded w-full py-2 px-3"
-            required
-            value={spotDescription}
-            onChange={(e) => setSpotDescription(e.target.value)}
           />
         </div>
         <div>
@@ -136,6 +131,19 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
           />
         </div>
         <div>
+          <label htmlFor="spotDescription">Description:</label>
+          <textarea
+            id="spotDescription"
+            name="spotDescription"
+            className="border border-gray-300 rounded w-full py-2 px-3"
+            rows={4}
+            required
+            value={spotDescription}
+            onChange={(e) => setSpotDescription(e.target.value)}
+          />
+        </div>
+
+        <div>
           <label htmlFor="image">Image:</label>
           <input
             type="file"
@@ -144,6 +152,16 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
             className="border border-gray-300 rounded w-full py-2 px-3"
             onChange={handleImageChange}
           />
+          {imagePreview && (
+            <div className="mt-4 m-auto ">
+              <p>Image Preview:</p>
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-auto rounded"
+              />
+            </div>
+          )}
         </div>
         <button
           type="submit"

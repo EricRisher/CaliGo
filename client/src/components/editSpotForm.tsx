@@ -128,16 +128,16 @@ function EditSpotForm({
 
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-end z-50 mx-auto">
-      <div className="bg-white w-full max-w-lg rounded-t-lg p-6">
+      <div className="bg-white w-full max-w-[100vw] rounded-t-lg p-6">
         <div className="flex justify-between items-center">
           <button onClick={closeForm}>
             <Image src="/icons/close.png" alt="Close" width={24} height={24} />
           </button>
         </div>
-        <div className="bg-slate-200 rounded-lg mt-4">
+        <div className="rounded-lg mt-4">
           <button
             type="button"
-            className="flex flex-row p-2 justify-end"
+            className="flex flex-row p-2 justify-end bg-slate-200 rounded-lg"
             onClick={handleDelete}
           >
             <Image
