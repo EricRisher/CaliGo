@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { CommentPreview } from "../components/commentPreview";
+import EditSpotForm from "./editSpotForm";
 
 // Define interfaces for Spot, Comment, and User
 interface Comment {
@@ -49,6 +50,8 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [mySpots, setMySpots] = useState<Spot[]>([]);
   const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
 
   // Function to fetch city name from coordinates using Google Maps Geocoding API
   const fetchCityFromCoordinates = async (
@@ -76,6 +79,11 @@ export function Spots({ spotId }: { spotId?: string }) {
       console.error("Error fetching city name:", error);
       return "Unknown Location";
     }
+  };
+
+  const openEditForm = (spot: Spot) => {
+    setSelectedSpot(spot);
+    setShowEditForm(true);
   };
 
   const fetchSpots = async () => {
@@ -120,32 +128,8 @@ export function Spots({ spotId }: { spotId?: string }) {
     }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/auth/edit-profile`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const user = await response.json();
-        setUsername(user.username);
-        setMySpots(user.mySpots || []);
-        setSavedSpots(user.savedSpots || []);
-        setProfilePicture(user.profilePicture || "/icons/user.png"); // Default if not set
-        setIsLoggedIn(true);
-      } else {
-        console.error("Invalid token or session expired");
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setIsLoggedIn(false);
-    }
-  };
 
   useEffect(() => {
-    fetchUserData();
     fetchSpots();
   }, [spotId]);
 
@@ -179,25 +163,37 @@ export function Spots({ spotId }: { spotId?: string }) {
 
   return (
     <div>
+      {selectedSpot && showEditForm && (
+        <EditSpotForm
+          spot={selectedSpot}
+          closeForm={() => setShowEditForm(false)}
+        />
+      )}
       {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
           className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center relative">
             <div>
               <p className="font-bold mb-0">{spot.spotName}</p>
               <p className="mt-0">{spot.location}</p>
             </div>
-            <button>
-              {/* <img
+            {/* <img
                 src={profilePicture || "/icons/user.png"}
                 alt="Profile"
                 width={48}
                 height={48}
                 className="rounded-full"
               /> */}
-            </button>
+            <Image
+              src={"/icons/menu.png"}
+              alt="Menu"
+              width={20}
+              height={20}
+              className="cursor-pointer"
+              onClick={() => openEditForm(spot)}
+            />
           </div>
           <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (

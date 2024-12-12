@@ -110,6 +110,7 @@ function ProfileContent() {
         <div className="relative w-full p-4 flex justify-between items-center z-10">
           <button onClick={() => (window.location.href = "/home")}>
             <Image src="/icons/close.png" alt="Close" width={32} height={32} />
+            <span className="sr-only">Close</span>
           </button>
           {/* <button>
           <Image
@@ -124,7 +125,8 @@ function ProfileContent() {
         {/* Profile Picture and Username */}
         <div className="flex flex-col items-center mt-4 relative z-10">
           {/* <Image src="/icons/user.png" alt="Profile" width={128} height={128} /> */}
-          <h1 className="text-2xl">{`${username}'s Profile`}</h1>
+          <h1 className="text-2xl">{username}</h1>
+          <p className="mt-0">{`Spots ${mySpots.length}`}</p>
         </div>
 
         {/* XP and Level Section */}
@@ -185,12 +187,7 @@ function ProfileContent() {
                       <img
                         src={spot.image}
                         alt={spot.spotName}
-                        className="w-full h-full object-cover"
-                        style={{
-                          width: "50vw",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     )}
                   </button>

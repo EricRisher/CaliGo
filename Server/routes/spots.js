@@ -9,7 +9,6 @@ const router = express.Router();
 
 // Set the base upload directory on the server-side
 const baseUploadPath = path.join(__dirname, "../uploads");
-console.log("Base Upload Path:", baseUploadPath);
 
 if (!fs.existsSync(baseUploadPath)) {
   fs.mkdirSync(baseUploadPath, { recursive: true });
@@ -184,14 +183,25 @@ router.put("/:spotId", authMiddleware, async (req, res) => {
 
 // Delete a spot by spotId (Protected Route)
 router.delete("/:spotId", authMiddleware, async (req, res) => {
+  const { spotId } = req.params;
+  const userId = req.user?.id;
+  console.log("Authenticated user ID:", req.auth?.id); // Debugging
+  
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
-    const spot = await Spot.findByPk(req.params.spotId);
+    console.log("Authenticated user ID:", req.auth?.userId); // Debugging
+
+    const spot = await Spot.findByPk(spotId);
     if (!spot) {
       return res.status(404).json({ error: "Spot not found" });
     }
 
-    // Ensure the user deleting the spot is the owner
-    if (spot.userId !== req.auth.userId) {
+    // Ensure the user deleting the spot is the owner or an admin
+    if (spot.userId !== userId) {
       return res
         .status(403)
         .json({ error: "You are not authorized to delete this spot" });

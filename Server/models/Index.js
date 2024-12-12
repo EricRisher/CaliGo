@@ -49,6 +49,7 @@ User.belongsToMany(Spot, {
   otherKey: "spotId",
   onDelete: "CASCADE",
 });
+
 Spot.belongsToMany(User, {
   through: Like,
   as: "UsersWhoLiked", // Alias for users who liked the spot
@@ -72,10 +73,6 @@ Spot.belongsToMany(User, {
   otherKey: "userId",
   onDelete: "CASCADE",
 });
-
-// Ensure the SavedSpot model associations are explicitly defined
-SavedSpot.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
-SavedSpot.belongsTo(Spot, { foreignKey: "spotId", onDelete: "CASCADE" });
 
 // Export all models for use in other files
 module.exports = { User, Spot, Comment, Like, SavedSpot };
