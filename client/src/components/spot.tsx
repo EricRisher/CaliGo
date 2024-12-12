@@ -50,9 +50,9 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [username, setUsername] = useState<string | null>(null);
   const [mySpots, setMySpots] = useState<Spot[]>([]);
   const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
   // Function to fetch city name from coordinates using Google Maps Geocoding API
   const fetchCityFromCoordinates = async (
@@ -129,7 +129,6 @@ export function Spots({ spotId }: { spotId?: string }) {
     }
   };
 
-
   useEffect(() => {
     fetchSpots();
   }, [spotId]);
@@ -168,6 +167,7 @@ export function Spots({ spotId }: { spotId?: string }) {
         <EditSpotForm
           spot={selectedSpot}
           closeForm={() => setShowEditForm(false)}
+          loggedInUser={loggedInUser} // Pass the current user
         />
       )}
       {spotsData.map((spot: Spot) => (
