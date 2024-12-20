@@ -104,15 +104,17 @@ export default function Home() {
             locations, and connect with fellow adventurers who share your
             passion for discovery.
           </p>
-          <Button onClick={login}>
-            Start Exploring Now <ArrowCircleRightOutlinedIcon />
-          </Button>
-          {/* Custom Install Button */}
-          {showInstallButton && (
-            <Button onClick={installPWA} className="mt-4">
-              Install App
+          <div className="flex flex-row justify-evenly flex-wrap">
+            <Button onClick={login} className="mt-2">
+              Start Exploring Now <ArrowCircleRightOutlinedIcon />
             </Button>
-          )}
+            {/* Custom Install Button */}
+            {showInstallButton && (
+              <Button onClick={installPWA} className="bg-orange-400 text-white mt-2">
+                Install App
+              </Button>
+            )}
+          </div>
           {/* iOS Instructions */}
           {isIos && (
             <div className="mt-4">
@@ -122,6 +124,7 @@ export default function Home() {
               </p>
             </div>
           )}
+
           {/* Hero Images */}
           <div className="text-left hero-text">
             <h2 className="mt-20">Explore. &nbsp; Share. &nbsp; Inspire.</h2>

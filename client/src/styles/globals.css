@@ -187,7 +187,7 @@ a {
 
   .map {
     height: 100vh !important;
-    max-width: (calc(100vw - 400px));
+    width: 100vw;
   }
 
   .navbar {
@@ -235,9 +235,14 @@ a {
   .spot {
     width: 30rem;
   }
-  
+
   .hero-text {
     padding-left: 4rem;
+  }
+
+  .locate-btn {
+    bottom: 100px !important;
+    left: 200px !important;
   }
 }
 
@@ -272,7 +277,8 @@ a {
   }
 
   .map {
-    height: 100vh !important;
+    height: calc(100vh - 60px) !important;
+    margin-bottom: 100px !important;
   }
 }
 
@@ -302,7 +308,6 @@ a {
   cursor: pointer;
   text-decoration: none;
   align-content: center;
-  margin: auto;
   font-family: "Poppins", sans-serif;
   letter-spacing: 1.5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
@@ -312,7 +317,7 @@ a {
 .btn-secondary {
   display: block;
   color: #ffffff;
-  background-color: #5a88ff;
+  background-color: #fb923c;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
@@ -327,7 +332,15 @@ a {
 }
 
 .locate-btn {
-  bottom: 6rem;
+  position: absolute;
+  z-index: 100;
+  height: 52px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  bottom: 80px;
+  left: 8px;
 }
 
 button {
@@ -340,6 +353,15 @@ button {
 .btn-primary:focus {
   background-color: #5a88ff;
   color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  outline: none; /* Remove default focus outline */
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #ffffff;
+  color: #000000;
   transform: scale(1.05);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
   outline: none; /* Remove default focus outline */

@@ -64,6 +64,7 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         zoom: 8,
         mapTypeId: "hybrid",
         styles: mapStyle, // Apply the custom style here
+        gestureHandling: "greedy",
       });
       setMap(newMap);
     }
@@ -124,25 +125,14 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
     <div className="relative">
       <div
         ref={mapRef}
-        className={`map mt-[82px] ${className || ""}`}
+        className={`map ${className}`}
         style={{
-          width: "100%",
-          position: "absolute",
+          position: "relative",
+          display: "block",
+          height: "calc(100vh - 100px)", // Adjust height to prevent navbar overlap
         }}
       ></div>
-      <button
-        onClick={handleLocateUser}
-        style={{
-          position: "absolute",
-          zIndex: 100,
-          backgroundColor: "white",
-          padding: "10px",
-          borderRadius: "50%",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          top: "74vh",
-          left: "2%",
-        }}
-      >
+      <button onClick={handleLocateUser} className="locate-btn">
         <img
           src="/icons/mylocation.png"
           alt="Locate Me"
