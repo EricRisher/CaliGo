@@ -81,7 +81,9 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         });
 
         const infoWindow = new google.maps.InfoWindow({
-          content: `<a href="/spot/${spot.id}">${spot.spotName}</a>`,
+          content: `<a href="/spot/${spot.id}">${spot.spotName}</a>
+                    <img src="${spot.image}" alt="${spot.spotName}" width="200" />
+          `,
         });
 
         marker.addListener("click", () => {
