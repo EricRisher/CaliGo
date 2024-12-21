@@ -65,12 +65,7 @@ User.init(
         return updatedUserData;
       },
     },
-    indexes: [
-      {
-        unique: true,
-        fields: ["email", "username"], // Composite unique index
-      },
-    ],
+    indexes: [{ unique: true, fields: ["username", "email"] }],
   }
 );
 
