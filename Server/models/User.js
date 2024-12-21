@@ -19,6 +19,7 @@ User.init(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         len: [3, 30], // Username length validation
       },
@@ -26,6 +27,7 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         isEmail: true,
       },
@@ -65,7 +67,6 @@ User.init(
         return updatedUserData;
       },
     },
-    indexes: [{ unique: true, fields: ["username", "email"] }],
   }
 );
 
