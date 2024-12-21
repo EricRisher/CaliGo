@@ -81,8 +81,11 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
         });
 
         const infoWindow = new google.maps.InfoWindow({
-          content: `<a href="/spot/${spot.id}">${spot.spotName}</a>
-                    <img src="${spot.image}" alt="${spot.spotName}" width="200" />
+          content: `
+          <div style="max-width: 200px; align-items: center; text-align:left;">
+            <a href="/spot/${spot.id}">${spot.spotName}</a>
+            <img src="${spot.image}" alt="${spot.spotName}" width="100%" />
+          </div>
           `,
         });
 
