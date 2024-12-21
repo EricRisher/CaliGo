@@ -156,7 +156,7 @@ export default function SpotDetail() {
       </div>
       <CommentPreview
         comments={
-          spot.Comments?.map((comment) => ({
+          spot.comments?.map((comment) => ({
             commentText: comment.commentText,
             username: comment.commentAuthor?.username || "Anonymous",
           })) || []
