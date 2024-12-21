@@ -109,7 +109,7 @@ function ProfileContent() {
         {/* Profile Header */}
         <div className="relative w-full p-4 flex justify-between items-center z-10">
           <button onClick={() => (window.location.href = "/home")}>
-            <Image src="/icons/close.png" alt="Close" width={32} height={32} />
+            <Image src="/icons/back.png" alt="Close" width={32} height={32} />
             <span className="sr-only">Close</span>
           </button>
           {/* <button>
@@ -148,7 +148,7 @@ function ProfileContent() {
       </div> */}
 
         {/* Tabs for My Spots and Saved Spots */}
-        <div className="w-full px-4 relative z-10 bg-slate-300 min-h-[80vh]">
+        <div className="w-full px-2 relative z-10 bg-slate-300 min-h-[80vh]">
           <div className="flex space-x-4 m-4 ">
             <button
               className={`py-2 px-4 rounded-lg ${
@@ -173,12 +173,12 @@ function ProfileContent() {
           </div>
 
           {/* Display My Spots or Saved Spots */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-1">
             {activeTab === "My Spots" &&
               mySpots.map((spot) => (
                 <div
                   key={spot.id}
-                  className="relative overflow-hidden rounded-lg shadow-md"
+                  className="relative overflow-hidden rounded-sm shadow-md"
                   style={{ width: "100%", aspectRatio: "1 / 1" }}
                 >
                   <button onClick={() => router.push(`/spot/${spot.id}`)}>

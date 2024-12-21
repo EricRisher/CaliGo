@@ -103,7 +103,7 @@ export default function SpotDetail() {
   return (
     <div className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto">
       <Header />
-      <div className="flex justify-between items-center relative mt-[82px]">
+      <div className="flex justify-between items-center relative mt-[100px]">
         <div>
           <p className="font-bold mb-0">{spot.spotName}</p>
           <p className="mt-0">{spot.location}</p>
