@@ -131,31 +131,47 @@ router.get("/", authMiddleware, async (req, res) => {
 // Get a spot by spotId
 router.get("/:spotId", async (req, res) => {
   try {
-    const comments = await Comment.findAll({
-      where: { spotId: req.params.spotId },
+    const spot = await Spot.findByPk(req.params.spotId, {
       include: [
         {
           model: User,
-          attributes: ["username"], // Fetch only username
+          as: "creator",
+          attributes: ["id", "username"],
+        },
+        {
+          model: Comment,
+          as: "Comments",
+          attributes: ["id", "commentText"],
+          include: [
+            {
+              model: User,
+              as: "commentAuthor",
+              attributes: ["id", "username"],
+            },
+          ],
+        },
+        {
+          model: User, // Reference to User model through Likes
+          as: "UsersWhoLiked", // Alias used in the relationship
+          attributes: ["id"],
         },
       ],
     });
 
-    if (comments.length === 0) {
-      console.log(`No comments found for spot ID ${req.params.spotId}`);
-      return res
-        .status(404)
-        .json({ message: "No comments found for this spot" });
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
     }
 
-    console.log(
-      `Comments fetched successfully for spot ID ${req.params.spotId}`,
-      comments
-    );
-    res.status(200).json(comments);
+    const spotWithLikeState = {
+      ...spot.toJSON(),
+      userLiked: false,
+      commentCount: spot.Comments ? spot.Comments.length : 0,
+    };
+
+    res.status(200).json(spotWithLikeState);
   } catch (error) {
-    console.error("Error in GET /comments/:spotId route:", error);
-    res.status(500).json({ error: error.message });
+    console.log(error);
+    res.status(500).json({ error });
   }
 });
 
@@ -186,7 +202,6 @@ router.delete("/:spotId", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
   const userId = req.user?.id;
   console.log("Authenticated user ID:", req.auth?.id); // Debugging
-  
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });

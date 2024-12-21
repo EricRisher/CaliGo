@@ -87,47 +87,49 @@ export function Spots({ spotId }: { spotId?: string }) {
     setShowEditForm(true);
   };
 
-  const fetchSpots = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/spots`, {
-        credentials: "include",
-      });
+const fetchSpots = async () => {
+  try {
+    const url = spotId
+      ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
+      : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch spots: ${response.statusText}`);
-      }
+    const response = await fetch(url, {
+      credentials: "include",
+    });
 
-      const data: Spot[] = await response.json();
-
-      // Resolve coordinates to city names
-      const spotsWithCity = await Promise.all(
-        data.map(async (spot) => {
-          const cityName = await fetchCityFromCoordinates(
-            spot.latitude,
-            spot.longitude
-          );
-          return { ...spot, location: cityName };
-        })
-      );
-
-      setSpotsData(spotsWithCity);
-
-      // Map initial liked states
-      const initialLikedPosts = spotsWithCity.reduce(
-        (acc: { [id: number]: boolean }, spot: Spot) => {
-          acc[spot.id] = spot.userLiked;
-          return acc;
-        },
-        {}
-      );
-
-      setLikedPosts(initialLikedPosts); // Update the likedPosts state
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching spots:", error);
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch spots: ${response.statusText}`);
     }
-  };
+
+    const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
+    const spotsWithCity = await Promise.all(
+      data.map(async (spot: Spot) => {
+        const cityName = await fetchCityFromCoordinates(
+          spot.latitude,
+          spot.longitude
+        );
+        return { ...spot, location: cityName };
+      })
+    );
+
+    setSpotsData(spotsWithCity);
+
+    // Map initial liked states
+    const initialLikedPosts = spotsWithCity.reduce(
+      (acc: { [id: number]: boolean }, spot: Spot) => {
+        acc[spot.id] = spot.userLiked;
+        return acc;
+      },
+      {}
+    );
+
+    setLikedPosts(initialLikedPosts); // Update the likedPosts state
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching spots:", error);
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchSpots();
