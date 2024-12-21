@@ -22,6 +22,7 @@ User.init(
       validate: {
         len: [3, 30], // Username length validation
       },
+      unique: false, // Prevent Sequelize from auto-creating a unique index
     },
     email: {
       type: DataTypes.STRING,
@@ -29,6 +30,7 @@ User.init(
       validate: {
         isEmail: true,
       },
+      unique: false, // Prevent Sequelize from auto-creating a unique index
     },
     password: {
       type: DataTypes.STRING,
@@ -68,7 +70,7 @@ User.init(
     indexes: [
       {
         unique: true,
-        fields: ["email","username"],
+        fields: ["email", "username"], // Composite unique index
       },
     ],
   }
