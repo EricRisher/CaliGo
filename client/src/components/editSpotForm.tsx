@@ -114,7 +114,6 @@ function EditSpotForm({
       if (response.ok) {
         alert("Spot deleted successfully!");
         closeForm(); // Close the form
-        location.reload();
       } else {
         const errorData = await response.json();
         console.error("Error deleting spot:", errorData.error);

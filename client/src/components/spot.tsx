@@ -40,19 +40,16 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [spotsData, setSpotsData] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState<{ [id: number]: boolean }>({});
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [bookmarkedPosts, setBookmarkedPosts] = useState<{
     [id: number]: boolean;
   }>({});
   const [commentsData, setCommentsData] = useState<{ [id: number]: Comment[] }>(
     {}
   );
-  const [username, setUsername] = useState<string | null>(null);
-  const [mySpots, setMySpots] = useState<Spot[]>([]);
-  const [savedSpots, setSavedSpots] = useState<Spot[]>([]);
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+  const [reloadTrigger, setReloadTrigger] = useState(false); // Trigger for re-fetching data
 
   // Function to fetch city name from coordinates using Google Maps Geocoding API
   const fetchCityFromCoordinates = async (
@@ -87,49 +84,49 @@ export function Spots({ spotId }: { spotId?: string }) {
     setShowEditForm(true);
   };
 
-const fetchSpots = async () => {
-  try {
-    const url = spotId
-      ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
-      : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
+  const fetchSpots = async () => {
+    try {
+      const url = spotId
+        ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
+        : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
 
-    const response = await fetch(url, {
-      credentials: "include",
-    });
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch spots: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch spots: ${response.statusText}`);
+      }
+
+      const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
+      const spotsWithCity = await Promise.all(
+        data.map(async (spot: Spot) => {
+          const cityName = await fetchCityFromCoordinates(
+            spot.latitude,
+            spot.longitude
+          );
+          return { ...spot, location: cityName };
+        })
+      );
+
+      setSpotsData(spotsWithCity);
+
+      // Map initial liked states
+      const initialLikedPosts = spotsWithCity.reduce(
+        (acc: { [id: number]: boolean }, spot: Spot) => {
+          acc[spot.id] = spot.userLiked;
+          return acc;
+        },
+        {}
+      );
+
+      setLikedPosts(initialLikedPosts); // Update the likedPosts state
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching spots:", error);
+      setLoading(false);
     }
-
-    const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
-    const spotsWithCity = await Promise.all(
-      data.map(async (spot: Spot) => {
-        const cityName = await fetchCityFromCoordinates(
-          spot.latitude,
-          spot.longitude
-        );
-        return { ...spot, location: cityName };
-      })
-    );
-
-    setSpotsData(spotsWithCity);
-
-    // Map initial liked states
-    const initialLikedPosts = spotsWithCity.reduce(
-      (acc: { [id: number]: boolean }, spot: Spot) => {
-        acc[spot.id] = spot.userLiked;
-        return acc;
-      },
-      {}
-    );
-
-    setLikedPosts(initialLikedPosts); // Update the likedPosts state
-    setLoading(false);
-  } catch (error) {
-    console.error("Error fetching spots:", error);
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchSpots();
@@ -140,14 +137,19 @@ const fetchSpots = async () => {
     const url = `${apiUrl}/spots/${spotId}/${isLiked ? "unlike" : "like"}`;
 
     try {
+      // Optimistically update the UI
       setLikedPosts((prev) => ({ ...prev, [spotId]: !isLiked }));
+
       const response = await fetch(url, {
         method: isLiked ? "DELETE" : "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        // Re-fetch spots data to reflect updated likes
+        fetchSpots();
+      } else {
         console.error("Failed to toggle like:", response.statusText);
       }
     } catch (error) {
