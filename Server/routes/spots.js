@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Spot, User, Comment, Like } = require("../models");
+const { Spot, User, Comment, Like, SavedSpot } = require("../models");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -104,24 +104,33 @@ router.get("/", authMiddleware, async (req, res) => {
           attributes: ["id", "commentText"],
         },
         {
-          model: User, // Reference to User model through Likes
-          as: "UsersWhoLiked", // Alias used in the relationship
+          model: User,
+          as: "UsersWhoLiked",
           attributes: ["id"],
-          through: { attributes: [] }, // Exclude intermediate table fields
+          through: { attributes: [] },
           where: { id: userId },
-          required: false, // Include even if user hasn't liked the spot
+          required: false,
+        },
+        {
+          model: User,
+          as: "UsersWhoSaved",
+          attributes: ["id"],
+          through: { attributes: [] },
+          where: { id: userId },
+          required: false,
         },
       ],
       order: [["id", "DESC"]],
     });
 
-    const spotsWithLikeState = spots.map((spot) => ({
+    const spotsWithStates = spots.map((spot) => ({
       ...spot.toJSON(),
-      userLiked: spot.UsersWhoLiked.length > 0, // Check if user liked the spot
+      userLiked: spot.UsersWhoLiked.length > 0,
+      userSaved: spot.UsersWhoSaved.length > 0,
       commentCount: spot.Comments ? spot.Comments.length : 0,
     }));
 
-    res.status(200).json(spotsWithLikeState);
+    res.status(200).json(spotsWithStates);
   } catch (error) {
     console.error("Error fetching spots:", error);
     res.status(500).json({ message: "Failed to fetch spots" });
@@ -129,9 +138,12 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // Get a spot by spotId
-router.get("/:spotId", async (req, res) => {
+router.get("/:spotId", authMiddleware, async (req, res) => {
+  const { spotId } = req.params;
+  const userId = req.user?.id;
+
   try {
-    const spot = await Spot.findByPk(req.params.spotId, {
+    const spot = await Spot.findByPk(spotId, {
       include: [
         {
           model: User,
@@ -151,9 +163,20 @@ router.get("/:spotId", async (req, res) => {
           ],
         },
         {
-          model: User, // Reference to User model through Likes
-          as: "UsersWhoLiked", // Alias used in the relationship
+          model: User,
+          as: "UsersWhoLiked",
           attributes: ["id"],
+          through: { attributes: [] },
+          where: { id: userId },
+          required: false,
+        },
+        {
+          model: User,
+          as: "UsersWhoSaved",
+          attributes: ["id"],
+          through: { attributes: [] },
+          where: { id: userId },
+          required: false,
         },
       ],
     });
@@ -162,16 +185,17 @@ router.get("/:spotId", async (req, res) => {
       return res.status(404).json({ message: "Spot not found" });
     }
 
-    const spotWithLikeState = {
+    const spotWithStates = {
       ...spot.toJSON(),
-      userLiked: false,
+      userLiked: spot.UsersWhoLiked.length > 0,
+      userSaved: spot.UsersWhoSaved.length > 0,
       commentCount: spot.Comments ? spot.Comments.length : 0,
     };
 
-    res.status(200).json(spotWithLikeState);
+    res.status(200).json(spotWithStates);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error });
+    console.error("Error fetching spot:", error);
+    res.status(500).json({ message: "Failed to fetch spot" });
   }
 });
 
@@ -229,32 +253,35 @@ router.delete("/:spotId", authMiddleware, async (req, res) => {
   }
 });
 
-// Like a spot (Protected Route)
 router.post("/:spotId/like", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
-  const userId = req.user?.id; // Use req.user.id as set by authMiddleware
+  const userId = req.user?.id;
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  try {
-    // Check if the user already liked this spot
-    const existingLike = await Like.findOne({
-      where: { userId, spotId },
-    });
+  const spotIdInt = parseInt(spotId, 10);
+  if (isNaN(spotIdInt)) {
+    return res.status(400).json({ message: "Invalid Spot ID" });
+  }
 
+  try {
+    const spot = await Spot.findByPk(spotIdInt);
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
+    }
+
+    const existingLike = await Like.findOne({
+      where: { userId, spotId: spotIdInt },
+    });
     if (existingLike) {
       return res
         .status(400)
         .json({ message: "You have already liked this spot" });
     }
 
-    // Create a new like entry
-    await Like.create({ userId, spotId });
-
-    // Increment the likes count in the Spot model
-    const spot = await Spot.findByPk(spotId);
+    await Like.create({ userId, spotId: spotIdInt });
     spot.likes = (spot.likes || 0) + 1;
     await spot.save();
 
@@ -263,7 +290,7 @@ router.post("/:spotId/like", authMiddleware, async (req, res) => {
       .json({ message: "Spot liked successfully", likes: spot.likes });
   } catch (error) {
     console.error("Error liking post:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -296,21 +323,38 @@ router.delete("/:spotId/unlike", authMiddleware, async (req, res) => {
   }
 });
 
-// Save a spot (bookmark) (Protected Route)
 router.post("/:spotId/save", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
   const userId = req.user?.id;
 
-  try {
-    const existingSave = await SavedSpot.findOne({ where: { userId, spotId } });
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
+  const spotIdInt = parseInt(spotId, 10);
+  if (isNaN(spotIdInt)) {
+    return res.status(400).json({ message: "Invalid Spot ID" });
+  }
+
+  try {
+    const spot = await Spot.findByPk(spotIdInt);
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
+    }
+
+    const existingSave = await SavedSpot.findOne({
+      where: { userId, spotId: spotIdInt },
+    });
     if (existingSave) {
       return res.status(400).json({ message: "Spot already saved" });
     }
 
-    await SavedSpot.create({ userId, spotId });
+    await SavedSpot.create({ userId, spotId: spotIdInt });
 
-    res.status(201).json({ message: "Spot saved successfully" });
+    res.status(201).json({
+      message: "Spot saved successfully",
+      userSaved: true,
+    });
   } catch (error) {
     console.error("Error saving spot:", error);
     res.status(500).json({ message: "Failed to save spot" });
@@ -318,20 +362,33 @@ router.post("/:spotId/save", authMiddleware, async (req, res) => {
 });
 
 // Remove a saved spot (Protected Route)
-router.delete("/:spotId/save", authMiddleware, async (req, res) => {
+router.delete("/:spotId/unsave", authMiddleware, async (req, res) => {
   const { spotId } = req.params;
   const userId = req.user?.id;
 
-  try {
-    const savedSpot = await SavedSpot.findOne({ where: { userId, spotId } });
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
+  const spotIdInt = parseInt(spotId, 10);
+  if (isNaN(spotIdInt)) {
+    return res.status(400).json({ message: "Invalid Spot ID" });
+  }
+
+  try {
+    const savedSpot = await SavedSpot.findOne({
+      where: { userId, spotId: spotIdInt },
+    });
     if (!savedSpot) {
-      return res.status(400).json({ message: "Spot not saved" });
+      return res.status(404).json({ message: "Spot not saved" });
     }
 
     await savedSpot.destroy();
 
-    res.status(200).json({ message: "Spot removed from saved spots" });
+    res.status(200).json({
+      message: "Spot removed from saved spots",
+      userSaved: false,
+    });
   } catch (error) {
     console.error("Error removing saved spot:", error);
     res.status(500).json({ message: "Failed to remove saved spot" });

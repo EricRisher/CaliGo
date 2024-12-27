@@ -60,8 +60,8 @@ export default function CustomMap({ spots, className }: CustomMapProps) {
       ];
 
       const newMap = new google.maps.Map(mapRef.current, {
-        center: { lat: 34.0522, lng: -118.2437 },
-        zoom: 8,
+        center: { lat: 36.607658266804634, lng: -118.07203809790931 },
+        zoom: 6.5,
         mapTypeId: "hybrid",
         styles: mapStyle, // Apply the custom style here
         gestureHandling: "greedy",

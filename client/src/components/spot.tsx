@@ -31,6 +31,7 @@ interface Spot {
   commentCount?: number;
   likes: number;
   userLiked: boolean;
+  userSaved: boolean;
   updatedAt: string;
   creator: User;
 }
@@ -40,9 +41,7 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [spotsData, setSpotsData] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState<{ [id: number]: boolean }>({});
-  const [bookmarkedPosts, setBookmarkedPosts] = useState<{
-    [id: number]: boolean;
-  }>({});
+  const [savedPosts, setSavedPosts] = useState<{ [id: number]: boolean }>({});
   const [commentsData, setCommentsData] = useState<{ [id: number]: Comment[] }>(
     {}
   );
@@ -84,50 +83,59 @@ export function Spots({ spotId }: { spotId?: string }) {
     setShowEditForm(true);
   };
 
-  const fetchSpots = async () => {
-    try {
-      const url = spotId
-        ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
-        : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
+const fetchSpots = async () => {
+  try {
+    const url = spotId
+      ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
+      : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
 
-      const response = await fetch(url, {
-        credentials: "include",
-      });
+    const response = await fetch(url, {
+      credentials: "include",
+    });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch spots: ${response.statusText}`);
-      }
-
-      const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
-      const spotsWithCity = await Promise.all(
-        data.map(async (spot: Spot) => {
-          const cityName = await fetchCityFromCoordinates(
-            spot.latitude,
-            spot.longitude
-          );
-          return { ...spot, location: cityName };
-        })
-      );
-
-      setSpotsData(spotsWithCity);
-
-      // Map initial liked states
-      const initialLikedPosts = spotsWithCity.reduce(
-        (acc: { [id: number]: boolean }, spot: Spot) => {
-          acc[spot.id] = spot.userLiked;
-          return acc;
-        },
-        {}
-      );
-
-      setLikedPosts(initialLikedPosts); // Update the likedPosts state
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching spots:", error);
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch spots: ${response.statusText}`);
     }
-  };
 
+    const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
+
+    const spotsWithCity = await Promise.all(
+      data.map(async (spot: Spot) => {
+        const cityName = await fetchCityFromCoordinates(
+          spot.latitude,
+          spot.longitude
+        );
+        return { ...spot, location: cityName };
+      })
+    );
+
+    setSpotsData(spotsWithCity);
+
+    // Map initial liked and saved states
+    const initialLikedPosts = spotsWithCity.reduce(
+      (acc: { [id: number]: boolean }, spot: Spot) => {
+        acc[spot.id] = spot.userLiked;
+        return acc;
+      },
+      {}
+    );
+
+    const initialSavedPosts = spotsWithCity.reduce(
+      (acc: { [id: number]: boolean }, spot: Spot) => {
+        acc[spot.id] = spot.userSaved; // Include `userSaved` from API response
+        return acc;
+      },
+      {}
+    );
+
+    setLikedPosts(initialLikedPosts); // Update the likedPosts state
+    setSavedPosts(initialSavedPosts); // Update the savedPosts state
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching spots:", error);
+    setLoading(false);
+  }
+};
   useEffect(() => {
     fetchSpots();
   }, [spotId]);
@@ -154,6 +162,32 @@ export function Spots({ spotId }: { spotId?: string }) {
       }
     } catch (error) {
       console.error("Error toggling like:", error);
+    }
+  };
+
+  const toggleSave = async (spotId: number) => {
+    const isSaved = savedPosts[spotId];
+    const url = `${apiUrl}/spots/${spotId}/${isSaved ? "unsave" : "save"}`;
+
+    try {
+      // Optimistically update the UI
+      setSavedPosts((prev) => ({ ...prev, [spotId]: !isSaved }));
+
+      const response = await fetch(url, {
+        method: isSaved ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        fetchSpots();
+      } else {
+        console.error("Failed to toggle like:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error toggling save:", error);
+      // Revert UI change on error
+      setSavedPosts((prev) => ({ ...prev, [spotId]: isSaved }));
     }
   };
 
@@ -236,6 +270,19 @@ export function Spots({ spotId }: { spotId?: string }) {
                 />
               </button>
               <span>{spot.commentCount || 0}</span>
+
+              <button onClick={() => toggleSave(spot.id)}>
+                <Image
+                  src={
+                    savedPosts[spot.id]
+                      ? "/icons/bookmark-filled.png"
+                      : "/icons/bookmark.png"
+                  }
+                  alt="Bookmark"
+                  width={32}
+                  height={32}
+                />
+              </button>
             </div>
           </div>
           <div>
@@ -243,25 +290,35 @@ export function Spots({ spotId }: { spotId?: string }) {
               <b>{spot.creator?.username}</b> {spot.description}
             </p>
           </div>
-          <CommentPreview
-            comments={
-              commentsData[spot.id]?.map((comment) => ({
-                commentText: comment.commentText,
-                username: comment.commentAuthor?.username || "Anonymous",
-              })) || []
-            }
-            onFetchComments={async () => {
-              const response = await fetch(`${apiUrl}/comments/${spot.id}`);
-              const fetchedComments = await response.json();
-              return Array.isArray(fetchedComments)
-                ? fetchedComments.map((comment: Comment) => ({
-                    commentText: comment.commentText,
-                    username: comment.commentAuthor?.username || "Anonymous",
-                  }))
-                : [];
-            }}
-            spotId={spot.id}
-          />
+          <div className="flex flex-row justify-between">
+            <CommentPreview
+              comments={
+                commentsData[spot.id]?.map((comment) => ({
+                  commentText: comment.commentText,
+                  username: comment.commentAuthor?.username || "Anonymous",
+                })) || []
+              }
+              onFetchComments={async () => {
+                const response = await fetch(`${apiUrl}/comments/${spot.id}`);
+                const fetchedComments = await response.json();
+                return Array.isArray(fetchedComments)
+                  ? fetchedComments.map((comment: Comment) => ({
+                      commentText: comment.commentText,
+                      username: comment.commentAuthor?.username || "Anonymous",
+                    }))
+                  : [];
+              }}
+              spotId={spot.id}
+            />
+            <button
+              onClick={() => {
+                window.location.href = `/spot/${spot.id}`;
+              }}
+              className="bg-gray-300 rounded-lg p-2 px-6"
+            >
+              See More
+            </button>
+          </div>
           <div className="mt-1 font-normal text-right">
             {new Date(spot.updatedAt).toLocaleDateString()}
           </div>

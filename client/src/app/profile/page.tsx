@@ -47,6 +47,7 @@ function ProfileContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
+  const [likedPosts, setLikedPosts] = useState<{ [id: number]: boolean }>({});
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
@@ -197,9 +198,19 @@ function ProfileContent() {
               savedSpots.map((spot) => (
                 <div
                   key={spot.id}
-                  className="bg-blue-300 rounded-md h-32 flex items-center justify-center"
+                  className="relative overflow-hidden rounded-sm shadow-md"
+                  style={{ width: "100%", aspectRatio: "1 / 1" }}
                 >
-                  <p>{spot.spotName}</p>
+                  <button onClick={() => router.push(`/spot/${spot.id}`)}>
+                    {spot.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={spot.image}
+                        alt={spot.spotName}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                  </button>
                 </div>
               ))}
           </div>
