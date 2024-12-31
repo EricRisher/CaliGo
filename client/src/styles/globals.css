@@ -96,6 +96,17 @@ a {
   letter-spacing: 2px;
 }
 
+.spot {
+  transform: translateX(100px);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.spot.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
 .navbar {
   position: fixed;
   bottom: 0;

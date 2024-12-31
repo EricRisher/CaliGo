@@ -8,7 +8,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
   const [spotCoordinates, setSpotCoordinates] = useState(""); // Combined lat, long input
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null); // For preview
-  const [isSubmitting, setIsSubmitting] = useState(false); // State to track submission
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to track submission 
 
   // Handle file input change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +56,7 @@ export function AddSpotForm({ closeForm }: { closeForm: () => void }) {
     formData.append("latitude", latitude.toString());
     formData.append("longitude", longitude.toString());
     formData.append("location", location); // Append location here
+
     if (image) {
       formData.append("image", image);
     }

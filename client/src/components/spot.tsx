@@ -22,6 +22,7 @@ interface Spot {
   id: number;
   spotName: string;
   location: string;
+  city: string;
   latitude: number;
   longitude: number;
   description: string;
@@ -48,94 +49,64 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [reloadTrigger, setReloadTrigger] = useState(false); // Trigger for re-fetching data
 
   // Function to fetch city name from coordinates using Google Maps Geocoding API
-  const fetchCityFromCoordinates = async (
-    latitude: number,
-    longitude: number
-  ): Promise<string> => {
-    try {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
-      );
-
-      if (!response.ok) {
-        console.error("Failed to fetch city name:", response.statusText);
-        return "Unknown Location";
-      }
-
-      const data = await response.json();
-      const city = data.results[0]?.address_components.find((component: any) =>
-        component.types.includes("locality")
-      )?.long_name;
-
-      return city || "Unknown Location";
-    } catch (error) {
-      console.error("Error fetching city name:", error);
-      return "Unknown Location";
-    }
-  };
 
   const openEditForm = (spot: Spot) => {
     setSelectedSpot(spot);
     setShowEditForm(true);
   };
 
-const fetchSpots = async () => {
-  try {
-    const url = spotId
-      ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
-      : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
+  const fetchSpots = async () => {
+    try {
+      const url = spotId
+        ? `${apiUrl}/spots/${spotId}` // Fetch a single spot if spotId is provided
+        : `${apiUrl}/spots`; // Fetch all spots if no spotId is provided
 
-    const response = await fetch(url, {
-      credentials: "include",
-    });
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch spots: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch spots: ${response.statusText}`);
+      }
+
+      const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
+
+      const spotsWithCity = await Promise.all(
+        data.map(async (spot: Spot) => {
+          const cityName = (spot.latitude, spot.longitude);
+          return { ...spot, location: cityName };
+        })
+      );
+
+      setSpotsData(spotsWithCity);
+
+      // Map initial liked and saved states
+      const initialLikedPosts = spotsWithCity.reduce(
+        (acc: { [id: number]: boolean }, spot: Spot) => {
+          acc[spot.id] = spot.userLiked;
+          return acc;
+        },
+        {}
+      );
+
+      const initialSavedPosts = spotsWithCity.reduce(
+        (acc: { [id: number]: boolean }, spot: Spot) => {
+          acc[spot.id] = spot.userSaved; // Include `userSaved` from API response
+          return acc;
+        },
+        {}
+      );
+
+      setLikedPosts(initialLikedPosts); // Update the likedPosts state
+      setSavedPosts(initialSavedPosts); // Update the savedPosts state
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching spots:", error);
+      setLoading(false);
     }
-
-    const data = spotId ? [await response.json()] : await response.json(); // Wrap single spot data in an array
-
-    const spotsWithCity = await Promise.all(
-      data.map(async (spot: Spot) => {
-        const cityName = await fetchCityFromCoordinates(
-          spot.latitude,
-          spot.longitude
-        );
-        return { ...spot, location: cityName };
-      })
-    );
-
-    setSpotsData(spotsWithCity);
-
-    // Map initial liked and saved states
-    const initialLikedPosts = spotsWithCity.reduce(
-      (acc: { [id: number]: boolean }, spot: Spot) => {
-        acc[spot.id] = spot.userLiked;
-        return acc;
-      },
-      {}
-    );
-
-    const initialSavedPosts = spotsWithCity.reduce(
-      (acc: { [id: number]: boolean }, spot: Spot) => {
-        acc[spot.id] = spot.userSaved; // Include `userSaved` from API response
-        return acc;
-      },
-      {}
-    );
-
-    setLikedPosts(initialLikedPosts); // Update the likedPosts state
-    setSavedPosts(initialSavedPosts); // Update the savedPosts state
-    setLoading(false);
-  } catch (error) {
-    console.error("Error fetching spots:", error);
-    setLoading(false);
-  }
-};
+  };
   useEffect(() => {
     fetchSpots();
   }, [spotId]);
@@ -191,6 +162,24 @@ const fetchSpots = async () => {
     }
   };
 
+  useEffect(() => {
+    if (spotsData.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("show", entry.isIntersecting);
+        });
+      },
+      { rootMargin: "0px", threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll(".spot");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [spotsData]);
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -208,15 +197,15 @@ const fetchSpots = async () => {
           loggedInUser={loggedInUser} // Pass the current user
         />
       )}
-      {spotsData.map((spot: Spot) => (
+      {spotsData.map((spot: Spot, id) => (
         <div
-          key={spot.id}
+          key={id}
           className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center relative">
             <div>
               <p className="font-bold mb-0">{spot.spotName}</p>
-              <p className="mt-0">{spot.location}</p>
+              <p className="mt-0">{spot.city}</p>
             </div>
             {/* <img
                 src={profilePicture || "/icons/user.png"}

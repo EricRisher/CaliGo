@@ -46,6 +46,10 @@ Spot.init(
       type: DataTypes.STRING,
       allowNull: false, // Assuming location is required
     },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true, // Assuming city is required
+    },
     image: {
       type: DataTypes.STRING,
       allowNull: false,

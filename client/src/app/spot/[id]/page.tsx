@@ -60,10 +60,10 @@ export default function SpotDetail() {
         const data: Spot = await response.json();
         setSpot(data);
         setLikedPosts((prev) => ({ ...prev, [data.id]: data.userLiked }));
-         setSavedPosts((prev) => {
-           const updatedState = { ...prev, [data.id]: data.userSaved };
-           return updatedState;
-         });
+        setSavedPosts((prev) => {
+          const updatedState = { ...prev, [data.id]: data.userSaved };
+          return updatedState;
+        });
       } catch (error) {
         console.error("Error fetching spot:", error);
       } finally {
@@ -127,48 +127,48 @@ export default function SpotDetail() {
     }
   };
 
- const toggleSave = async () => {
-   if (!spot) return;
+  const toggleSave = async () => {
+    if (!spot) return;
 
-   const spotId = spot.id;
-   const isCurrentlySaved = savedPosts[spotId];
-   const url = `${apiUrl}/spots/${spotId}/${
-     isCurrentlySaved ? "unsave" : "save"
-   }`;
+    const spotId = spot.id;
+    const isCurrentlySaved = savedPosts[spotId];
+    const url = `${apiUrl}/spots/${spotId}/${
+      isCurrentlySaved ? "unsave" : "save"
+    }`;
 
-   try {
-     // Optimistic update
-     setSavedPosts((prev) => {
-       const updatedState = { ...prev, [spotId]: !isCurrentlySaved };
-       return updatedState;
-     });
+    try {
+      // Optimistic update
+      setSavedPosts((prev) => {
+        const updatedState = { ...prev, [spotId]: !isCurrentlySaved };
+        return updatedState;
+      });
 
-     setSpot((prevSpot) => {
-       const updatedSpot = prevSpot
-         ? { ...prevSpot, userSaved: !isCurrentlySaved }
-         : prevSpot;
-       return updatedSpot;
-     });
+      setSpot((prevSpot) => {
+        const updatedSpot = prevSpot
+          ? { ...prevSpot, userSaved: !isCurrentlySaved }
+          : prevSpot;
+        return updatedSpot;
+      });
 
-     const response = await fetch(url, {
-       method: isCurrentlySaved ? "DELETE" : "POST",
-       headers: { "Content-Type": "application/json" },
-       credentials: "include",
-     });
+      const response = await fetch(url, {
+        method: isCurrentlySaved ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
-     if (!response.ok) {
-       throw new Error("Failed to toggle save");
-     }
-   } catch (error) {
-     console.error("Error toggling save:", error);
+      if (!response.ok) {
+        throw new Error("Failed to toggle save");
+      }
+    } catch (error) {
+      console.error("Error toggling save:", error);
 
-     // Revert UI changes on error
-     setSavedPosts((prev) => ({ ...prev, [spotId]: isCurrentlySaved }));
-     setSpot((prevSpot) =>
-       prevSpot ? { ...prevSpot, userSaved: isCurrentlySaved } : prevSpot
-     );
-   }
- };
+      // Revert UI changes on error
+      setSavedPosts((prev) => ({ ...prev, [spotId]: isCurrentlySaved }));
+      setSpot((prevSpot) =>
+        prevSpot ? { ...prevSpot, userSaved: isCurrentlySaved } : prevSpot
+      );
+    }
+  };
   const toggleLike = async () => {
     if (!spot) return;
 
@@ -298,7 +298,7 @@ export default function SpotDetail() {
 
       <div className="flex flex-col justify-start px-4">
         <p className="m-0">
-          <b>{spot.creator?.username}</b> {spot.description}
+          <b>{spot.creator?.username} •</b> {spot.description}
         </p>
       </div>
       <div className="p-4 flex flex-col justify-start">

@@ -4,8 +4,50 @@ const fs = require("fs");
 const path = require("path");
 const { Spot, User, Comment, Like, SavedSpot } = require("../models");
 const authMiddleware = require("../middlewares/authMiddleware");
+const axios = require("axios");
 
 const router = express.Router();
+
+// Helper function to fetch city from coordinates
+const fetchCityFromCoordinates = async (latitude, longitude) => {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    console.log(`Fetching city for coordinates: ${latitude}, ${longitude}`);
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+    );
+
+    console.log(
+      "Geocoding API Response:",
+      JSON.stringify(response.data, null, 2)
+    );
+
+    const city =
+      response.data.results[0]?.address_components.find((component) =>
+        component.types.includes("locality")
+      )?.long_name ||
+      response.data.results[0]?.address_components.find((component) =>
+        component.types.includes("administrative_area_level_1")
+      )?.long_name ||
+      response.data.results[0]?.address_components.find((component) =>
+        component.types.includes("sublocality")
+      )?.long_name;
+
+    if (!city) {
+      console.warn(
+        `No city found for coordinates (${latitude}, ${longitude}).`
+      );
+    }
+
+    return city || "Unknown Location";
+  } catch (error) {
+    console.error(
+      `Error fetching city for coordinates (${latitude}, ${longitude}):`,
+      error.message
+    );
+    return "Unknown Location";
+  }
+};
 
 // Set the base upload directory on the server-side
 const baseUploadPath = path.join(__dirname, "../uploads");
@@ -45,7 +87,6 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const { spotName, description, location } = req.body;
 
-    // Ensure location exists and split into latitude and longitude
     if (!location) {
       return res.status(400).json({
         message:
@@ -57,31 +98,35 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
       .split(",")
       .map((coord) => parseFloat(coord.trim()));
 
+    console.log("Parsed Coordinates:", { latitude, longitude });
+
     if (isNaN(latitude) || isNaN(longitude)) {
       return res.status(400).json({
         message: "Invalid coordinates format. Use 'latitude, longitude'.",
       });
     }
 
-    // Generate the relative path for the image (e.g., /uploads/userId/image.jpg)
+    const cityName = await fetchCityFromCoordinates(latitude, longitude);
+    console.log("Fetched City:", cityName);
+
     const imagePath = req.file
       ? `/uploads/${req.user.id}/${req.file.filename}`
       : null;
 
-    // Create the new spot
     const newSpot = await Spot.create({
       spotName,
       description,
       location,
       latitude,
       longitude,
+      city: cityName,
       image: imagePath,
-      userId: req.user.id, // Authenticated user ID
+      userId: req.user.id,
     });
 
     res.status(201).json(newSpot);
   } catch (error) {
-    console.error("Error creating new spot:", error);
+    console.error("Error creating new spot:", error.message);
     res.status(500).json({ message: "Failed to add the spot" });
   }
 });
