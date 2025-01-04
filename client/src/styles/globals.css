@@ -42,6 +42,11 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
+  overflow: visible;
+}
+
+html {
+  overflow: visible;
 }
 
 /* Global Heading Styles */
@@ -97,17 +102,22 @@ a {
 }
 
 .spot {
-  transform: translateX(100px);
+  transform: translateY(10vh);
   opacity: 0;
   transition: transform 0.5s, opacity 0.5s;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+  display: block;
 }
 
 .spot.show {
-  transform: translateX(0);
+  transform: translateY(0);
   opacity: 1;
 }
 
 .navbar {
+  z-index: 5;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -199,6 +209,10 @@ a {
   .map {
     height: 100vh !important;
     width: 100vw;
+  }
+
+  .spot-info {
+    margin-left: 176px !important;
   }
 
   .navbar {
@@ -350,7 +364,7 @@ a {
   padding: 10px;
   border-radius: 50%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  bottom: 80px;
+  bottom: 20vh;
   left: 8px;
 }
 
@@ -425,4 +439,24 @@ button {
 
 .visible-form {
   transform: translateY(-10vh);
+}
+
+.fixed-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75); /* Full-page dark overlay */
+  z-index: 100; /* Ensure it appears above other elements */
+}
+
+.fixed-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  background-color: #fff;
+  border-radius: 1rem 1rem 0 0;
+  max-height: calc(100vh - 70%); /* Calculate height dynamically */
+  overflow-y: auto;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
 }

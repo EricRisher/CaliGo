@@ -49,10 +49,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         ></script>
 
         <meta name="msapplication-TileColor" content="#2b5797" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
           rel="apple-touch-icon"
           sizes="180x180"

@@ -1,22 +1,26 @@
 "use client";
+
+import ReactDOM from "react-dom";
 import React, { useState, useEffect } from "react";
 
 type CommentPreviewProps = {
   comments: { commentText: string; username: string }[];
   onFetchComments: () => Promise<{ commentText: string; username: string }[]>;
   spotId: number;
+  isActive: boolean;
+  setActivePreview: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 export function CommentPreview({
   comments,
   onFetchComments,
   spotId,
+  isActive,
+  setActivePreview,
 }: CommentPreviewProps) {
-  const [showAllComments, setShowAllComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentList, setCommentList] = useState(comments);
 
-  // Unified function to fetch comments
   const fetchComments = async () => {
     try {
       const fetchedComments = await onFetchComments();
@@ -27,13 +31,21 @@ export function CommentPreview({
   };
 
   useEffect(() => {
-    // Fetch comments only when `showAllComments` is true
-    if (showAllComments) {
-      fetchComments();
+    if (isActive) {
+      document.body.style.overflow = "hidden";
+      fetchComments(); // Fetch comments when the modal is opened
+    } else {
+      document.body.style.overflow = "";
     }
-  }, [showAllComments]);
 
-  const handleViewAllComments = () => setShowAllComments((prev) => !prev);
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isActive]);
+
+  const handleViewAllComments = () => {
+    setActivePreview(isActive ? null : spotId);
+  };
 
   const handleNewCommentChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNewComment(e.target.value);
@@ -55,7 +67,7 @@ export function CommentPreview({
 
       if (!response.ok) throw new Error("Failed to submit comment");
 
-      await fetchComments(); // Refresh comments after posting a new one
+      await fetchComments();
       setNewComment("");
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -63,36 +75,38 @@ export function CommentPreview({
   };
 
   return (
-    <div>
-      <button onClick={handleViewAllComments} className="hover:underline mt-2">
-        {showAllComments ? "Close Comments" : "Show Comments"}
+    <>
+      <button onClick={handleViewAllComments} className="hover:underline">
+        {isActive ? "Close Comments" : "Show Comments"}
       </button>
 
-      {showAllComments && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-end mb-[80px] z-10">
-          <div className="bg-white rounded-t-lg max-h-[80%] w-full flex flex-col">
-            <div className="sticky top-0 p-4 bg-white z-10 border-b">
+      {isActive && (
+        <>
+          {/* Overlay */}
+          <div className="fixed-overlay"></div>
+
+          {/* Modal */}
+          <div className="fixed-modal">
+            <div className="p-4 border-b">
               <button
                 onClick={handleViewAllComments}
-                className="text-right text-gray-600 hover:underline"
+                className="text-gray-600 hover:underline"
               >
                 Close
               </button>
             </div>
-
-            <div className="flex-grow overflow-y-auto p-4 max-h-[30vh]">
+            <div className="p-4 overflow-y-auto max-h-[70vh]">
               {commentList.length > 0 ? (
                 commentList.map((comment, index) => (
                   <p key={index} className="text-sm">
-                    <strong>{comment.username} •</strong> {comment.commentText}
+                    <strong>{comment.username}:</strong> {comment.commentText}
                   </p>
                 ))
               ) : (
                 <p>No comments yet.</p>
               )}
             </div>
-
-            <div className="sticky bottom-0 p-4 bg-white border-t">
+            <div className="p-4 border-t">
               <form onSubmit={handleCommentSubmit}>
                 <input
                   type="text"
@@ -110,8 +124,8 @@ export function CommentPreview({
               </form>
             </div>
           </div>
-        </div>
+        </>
       )}
-    </div>
+    </>
   );
 }

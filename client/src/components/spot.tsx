@@ -49,8 +49,8 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-
-  // Function to fetch city name from coordinates using Google Maps Geocoding API
+  const [activePreview, setActivePreview] = useState<number | null>(null);
+  const [activeSpot, setActiveSpot] = useState<Spot | null>(null); // Track active spot for the modal
 
   const openEditForm = (spot: Spot) => {
     setSelectedSpot(spot);
@@ -198,6 +198,7 @@ export function Spots({ spotId }: { spotId?: string }) {
 
   return (
     <div>
+      {/* Edit Spot Form */}
       {selectedSpot && showEditForm && (
         <EditSpotForm
           spot={selectedSpot}
@@ -205,7 +206,33 @@ export function Spots({ spotId }: { spotId?: string }) {
           loggedInUser={loggedInUser} // Pass the current user
         />
       )}
-      {spotsData.map((spot: Spot, id) => (
+
+      {/* Comment Preview Modal */}
+      {activeSpot && (
+        <CommentPreview
+  comments={
+    (activeSpot?.comments || []).map((comment) => ({
+      commentText: comment.commentText,
+      username: comment.commentAuthor?.username || "Anonymous", // Add the username
+    }))
+  }
+  onFetchComments={async () => {
+    const response = await fetch(`${apiUrl}/comments/${activeSpot?.id}`);
+    const fetchedComments = await response.json();
+    return fetchedComments.map((comment: Comment) => ({
+      commentText: comment.commentText,
+      username: comment.commentAuthor?.username || "Anonymous", // Ensure username is included
+    }));
+  }}
+  spotId={activeSpot?.id || 0}
+  isActive={!!activeSpot}
+  setActivePreview={() => setActiveSpot(null)}
+/>
+
+      )}
+
+      {/* Spot List */}
+      {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
           className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
@@ -234,7 +261,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
               // eslint-disable-next-line @next/next/no-img-element
-              <Image
+              <img
                 src={spot.image}
                 alt={spot.spotName}
                 width={500}
@@ -306,6 +333,8 @@ export function Spots({ spotId }: { spotId?: string }) {
                   : [];
               }}
               spotId={spot.id}
+              isActive={activePreview === spot.id} // Pass true if the current preview is active
+              setActivePreview={setActivePreview} // Function to update the active preview
             />
             <button
               onClick={() => {

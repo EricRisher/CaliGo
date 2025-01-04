@@ -220,7 +220,7 @@ export default function SpotDetail() {
   };
 
   return (
-    <div className="container mx-auto mb-[200px]">
+    <div className="container spot-info mx-auto mb-[200px]">
       <Header />
       <div className="wrapper flex flex-col items-center mt-[82px] relative">
         <button
