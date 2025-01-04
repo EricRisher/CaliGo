@@ -284,7 +284,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           </div>
           <div>
             <p className="m-0 pt-2">
-              <b>{spot.creator?.username}</b> {spot.description}
+              <b>{spot.creator?.username} •</b> {spot.description}
             </p>
           </div>
           <div className="flex flex-row justify-between">
@@ -311,7 +311,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               onClick={() => {
                 window.location.href = `/spot/${spot.id}`;
               }}
-              className="bg-gray-300 rounded-lg p-2 px-6"
+              className="bg-gray-300 rounded-lg p-2 px-4"
             >
               See More
             </button>

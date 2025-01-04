@@ -65,7 +65,7 @@ export function CommentPreview({
   return (
     <div>
       <button onClick={handleViewAllComments} className="hover:underline mt-2">
-        {showAllComments ? "Close Comments" : "View All Comments"}
+        {showAllComments ? "Close Comments" : "Show Comments"}
       </button>
 
       {showAllComments && (
@@ -84,7 +84,7 @@ export function CommentPreview({
               {commentList.length > 0 ? (
                 commentList.map((comment, index) => (
                   <p key={index} className="text-sm">
-                    <strong>{comment.username}:</strong> {comment.commentText}
+                    <strong>{comment.username} •</strong> {comment.commentText}
                   </p>
                 ))
               ) : (
