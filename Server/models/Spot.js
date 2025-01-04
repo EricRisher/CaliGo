@@ -44,11 +44,11 @@ Spot.init(
     },
     location: {
       type: DataTypes.STRING,
-      allowNull: false, // Assuming location is required
+      allowNull: false,
     },
     city: {
       type: DataTypes.STRING,
-      allowNull: true, // Assuming city is required
+      allowNull: false,
     },
     image: {
       type: DataTypes.STRING,

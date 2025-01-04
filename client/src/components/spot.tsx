@@ -168,7 +168,15 @@ export function Spots({ spotId }: { spotId?: string }) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          entry.target.classList.toggle("show", entry.isIntersecting);
+          if (entry.isIntersecting) {
+            const img = entry.target.querySelector("img");
+            if (img && img.dataset.src) {
+              img.src = img.dataset.src; // Set the actual image source
+              img.removeAttribute("data-src"); // Clean up the data attribute
+            }
+            entry.target.classList.add("show"); // Optional class for animations
+            observer.unobserve(entry.target); // Stop observing the already-loaded image
+          }
         });
       },
       { rootMargin: "0px", threshold: 0.1 }
@@ -199,7 +207,7 @@ export function Spots({ spotId }: { spotId?: string }) {
       )}
       {spotsData.map((spot: Spot, id) => (
         <div
-          key={id}
+          key={spot.id}
           className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center relative">
@@ -226,7 +234,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={spot.image}
                 alt={spot.spotName}
                 width={500}

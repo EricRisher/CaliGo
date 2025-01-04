@@ -3,7 +3,7 @@ const axios = require("axios");
 
 const fetchCityFromCoordinates = async (latitude, longitude) => {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
     );
@@ -32,9 +32,14 @@ const fetchCityFromCoordinates = async (latitude, longitude) => {
 const populateCityField = async () => {
   try {
     const spots = await Spot.findAll(); // Fetch all spots
+    console.log(`Fetched ${spots.length} spots for processing.`);
 
     for (const spot of spots) {
-      if (!spot.city || spot.city === "Unknown Location") {
+      if (
+        !spot.city ||
+        spot.city === "Unknown Location" ||
+        spot.city.trim() === ""
+      ) {
         // Only update spots with a null or "Unknown Location" city field
         const cityName = await fetchCityFromCoordinates(
           spot.latitude,

@@ -10,6 +10,7 @@ interface Spot {
   spotName: string;
   latitude: number;
   longitude: number;
+  city: string;
   image: string;
 }
 
