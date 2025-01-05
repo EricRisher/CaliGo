@@ -1,11 +1,14 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { Header } from "@/components/header";
+import ImageUploadForm from "@/components/ImageUploadForm";
+import { Navigation } from "@/components/navbar";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { Header } from "@/components/header";
-import { Navigation } from "@/components/navbar";
+import { useEffect, useState } from "react";
+
+import axios from "axios";
 
 interface Comment {
   commentText: string;
@@ -47,6 +50,12 @@ export default function SpotDetail() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [images, setImages] = useState<
+    { id: number; url: string; uploaderId: number }[]
+  >([]); // Array of image objects
+  const [showImageForm, setShowImageForm] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const fetchSpot = async () => {
@@ -100,9 +109,27 @@ export default function SpotDetail() {
       }
     };
 
+    const fetchSpotImages = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/spots/${id}/images`, {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch spot images");
+        }
+        const data: { id: number; url: string; uploaderId: number }[] =
+          await response.json();
+        setImages(data); // Update the gallery
+      } catch (error) {
+        console.error("Error fetching spot images:", error);
+      }
+    };
+
+    // Call all fetch functions
     fetchSpot();
     fetchComments();
     fetchSavedStatus();
+    fetchSpotImages();
   }, [id, apiUrl]);
 
   const postComment = async () => {
@@ -206,26 +233,76 @@ export default function SpotDetail() {
   if (loading) return <p>Loading...</p>;
   if (!spot) return <p>Spot not found</p>;
 
-  const addPhotos = () => {
-    console.log("Add photos");
-  };
-
-  const viewImages = () => {
-    console.log("View images");
-  };
-
   const shareSpot = () => {
     navigator.clipboard.writeText(window.location.href);
     alert("Link copied to clipboard");
   };
 
+  const deleteImage = async (imageId: number) => {
+    try {
+      const response = await axios.delete(
+        `${apiUrl}/spots/${spot?.id}/images/${imageId}`,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        alert("Image deleted successfully.");
+        setImages((prevImages) =>
+          prevImages.filter((img) => img.id !== imageId)
+        );
+      } else {
+        throw new Error("Failed to delete image");
+      }
+    } catch (err) {
+      console.error("Error deleting image:", err);
+      alert("Unable to delete image. Please try again.");
+    }
+  };
+
+  const toggleImageForm = () => {
+    setShowImageForm(!showImageForm);
+  };
+
+  const fetchSpotImages = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/spots/${id}/images`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch spot images");
+      }
+      const data: { id: number; url: string; uploaderId: number }[] =
+        await response.json();
+      setImages(data); // Update the gallery
+    } catch (error) {
+      console.error("Error fetching spot images:", error);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    fetchSpotImages(); // Refresh the gallery after successful upload
+    setShowImageForm(false); // Optionally close the form after upload
+  };
+
+  const currentUser = {
+    id: 1, // Replace with the logged-in user's ID
+    role: "user", // Replace with the user's role (e.g., "admin")
+  };
+
+  // Check if the current user is authorized to edit the spot
+
+  const isAuthorized = () => {
+    spot?.creator.id === currentUser.id || // Spot poster
+      images.some((img) => img.uploaderId === currentUser.id) || // Image uploader
+      currentUser.role === "admin"; // Admin
+  };
   return (
-    <div className="container spot-info mx-auto mb-[200px]">
+    <div className="container spot-info mx-auto mb-[100px] mt-[82px]">
       <Header />
-      <div className="wrapper flex flex-col items-center mt-[82px] relative">
+      <div className="wrapper flex flex-col items-center relative">
         <button
           onClick={() => (window.location.href = `/home`)}
-          className="absolute top-0 left-0 p-2"
+          className="absolute top-0 left-0 p-2 z-10"
         >
           <Image
             src="/icons/back.png"
@@ -235,23 +312,28 @@ export default function SpotDetail() {
             height={28}
           />
         </button>
-        <img
-          src={spot.image}
-          alt={spot.spotName}
-          className="spot-image min-w-[50vw]"
-        />
-        <span className="absolute bottom-[-0.5vh] left-0 p-1 bg-black bg-opacity-0 backdrop-blur-lg w-full">
-          <h2 className="text-[#eaeaea] mb-0">{spot.spotName}</h2>
-          <h3 className="text-[#eaeaea] mb-0">{spot.location}</h3>
-        </span>
+        <div className="w-full relative">
+          <img
+            src={spot.image}
+            alt={spot.spotName}
+            className="spot-image w-full object-cover content"
+          />
+          <span className="absolute bottom-0 left-0 p-2 bg-gradient-to-t from-black to-transparent w-full  ">
+            <h2 className="text-white mb-0">{spot.spotName}</h2>
+            <h6 className="text-white mb-0">{spot.location}</h6>
+          </span>
+        </div>
       </div>
-      <div className="flex flex-row p-2 justify-start border-b-4 border-black-200">
-        <button onClick={addPhotos} className="flex flex-row p-2 justify-end">
+      <div className="flex flex-row p-2 justify-start border-b-2 border-black-200">
+        <button
+          onClick={toggleImageForm}
+          className="flex flex-row p-2 justify-end"
+        >
           Add Photos
         </button>
-        <button onClick={viewImages} className="flex flex-row p-2 justify-end">
+        {/* <button onClick={viewImages} className="flex flex-row p-2 justify-end">
           View Images
-        </button>
+        </button> */}
         <button onClick={shareSpot} className="flex flex-row p-2 justify-end">
           Share
         </button>
@@ -269,7 +351,6 @@ export default function SpotDetail() {
             height={32}
             className="mr-2"
           />
-          <span>{spot.likes}</span>
         </button>
         <button className="flex flex-row p-2 justify-end">
           <Image
@@ -296,13 +377,58 @@ export default function SpotDetail() {
         </button>
       </div>
 
-      <div className="flex flex-col justify-start px-4">
+      <div className="flex flex-col justify-start px-4 flex-wrap">
         <p className="m-0">
           <b>{spot.creator?.username} •</b> {spot.description}
         </p>
       </div>
+      {/* Spot Image Gallery */}
+      <div className="p-4 mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="mb-0">Gallery</h2>
+          {isAuthorized && (
+            <div className="flex flex-row">
+              <button onClick={toggleImageForm} className="p-2 mr-2">
+                Add Photos
+              </button>
+              <button
+                onClick={() => setIsEditMode((prev) => !prev)}
+                className="bg-gray-500 text-white px-6 py-2 rounded-lg"
+              >
+                {isEditMode ? "Done" : "Edit"}
+              </button>
+            </div>
+          )}
+        </div>
+        {images.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {images.map((image) => (
+              <div
+                key={image.id}
+                className="relative w-full max-h-40 rounded-lg overflow-hidden"
+              >
+                <img
+                  src={image.url} // Ensure correct path to the backend image URL
+                  alt={`Spot Image ${image.id}`}
+                  className="rounded-lg"
+                />
+                {isEditMode && (
+                  <button
+                    onClick={() => deleteImage(image.id)}
+                    className="absolute top-2 right-2 bg-red-500 opacity-75 text-white p-1 rounded"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No images added yet.</p>
+        )}
+      </div>
       <div className="p-4 flex flex-col justify-start">
-        <h3>Comments</h3>
+        <h3 className="mt-6">Comments</h3>
         {comments.map((comment, index) => (
           <p key={index}>
             <b>{comment.commentAuthor.username}:</b> {comment.commentText}
@@ -322,6 +448,15 @@ export default function SpotDetail() {
         </button>
       </div>
       <Navigation />
+
+      {showImageForm && (
+        <ImageUploadForm
+          spotId={spot.id}
+          apiUrl={process.env.NEXT_PUBLIC_API_URL || ""}
+          onClose={toggleImageForm}
+          onUploadSuccess={handleUploadSuccess} // Call this after successful upload
+        />
+      )}
     </div>
   );
 }

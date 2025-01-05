@@ -1,7 +1,6 @@
 "use client";
 
-import ReactDOM from "react-dom";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 type CommentPreviewProps = {
   comments: { commentText: string; username: string }[];

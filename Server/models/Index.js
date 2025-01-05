@@ -1,6 +1,7 @@
 // Import Models
 const User = require("./User");
 const Spot = require("./Spot");
+const SpotImage = require("./SpotImage");
 const Comment = require("./Comment");
 const Like = require("./Like");
 const SavedSpot = require("./SavedSpot");
@@ -27,6 +28,17 @@ Comment.belongsTo(User, {
   foreignKey: "userId",
   as: "commentAuthor", // Alias for the user who authored the comment
   onDelete: "CASCADE",
+});
+
+// Spot-SpotImage Relationship
+Spot.hasMany(SpotImage, {
+  foreignKey: "spotId",
+  as: "images",
+  onDelete: "CASCADE",
+});
+SpotImage.belongsTo(Spot, {
+  foreignKey: "spotId",
+  as: "spot",
 });
 
 // Spot-Comment Relationship
@@ -75,4 +87,4 @@ Spot.belongsToMany(User, {
 });
 
 // Export all models for use in other files
-module.exports = { User, Spot, Comment, Like, SavedSpot };
+module.exports = { User, Spot, SpotImage, Comment, Like, SavedSpot };

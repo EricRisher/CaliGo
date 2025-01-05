@@ -288,7 +288,7 @@ a {
     font-size: 1.1rem; /* ~18px */
   }
   h6 {
-    font-size: 0.95rem; /* ~15px */
+    font-size: 1rem; /* ~16px */
   }
 
   p {
@@ -456,7 +456,6 @@ button {
   z-index: 101;
   background-color: #fff;
   border-radius: 1rem 1rem 0 0;
-  max-height: calc(100vh - 70%); /* Calculate height dynamically */
   overflow-y: auto;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
 }

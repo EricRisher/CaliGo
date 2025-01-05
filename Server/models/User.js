@@ -39,6 +39,11 @@ User.init(
         len: [8, 100], // Password length validation
       },
     },
+    role: {
+      type: DataTypes.ENUM("user", "admin"), // Define possible roles
+      allowNull: false,
+      defaultValue: "user", 
+    },
     xp: {
       type: DataTypes.INTEGER,
       allowNull: false,

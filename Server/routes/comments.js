@@ -1,6 +1,5 @@
 const express = require("express");
 const Comment = require("../models/Comment");
-const Spot = require("../models/Spot");
 const User = require("../models/User");
 const authMiddleware = require("../middlewares/authMiddleware");
 

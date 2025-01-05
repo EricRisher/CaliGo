@@ -6,7 +6,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 const sequelize = require("./config/connection");
-const { addListener } = require("process");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -86,7 +85,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server and sync database
-sequelize.sync({ force: false, alter: true }).then(() => {
+sequelize.sync({ force: false, alter: false }).then(() => {
   app.listen(PORT, () =>
     console.log(`Server running at http://localhost:${PORT}`)
   );

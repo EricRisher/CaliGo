@@ -2,7 +2,14 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Spot, User, Comment, Like, SavedSpot } = require("../models");
+const {
+  Spot,
+  SpotImage,
+  User,
+  Comment,
+  Like,
+  SavedSpot,
+} = require("../models");
 const authMiddleware = require("../middlewares/authMiddleware");
 const axios = require("axios");
 
@@ -71,6 +78,94 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+// Upload images to a spot
+router.post(
+  "/:id/images",
+  authMiddleware,
+  upload.array("images", 10),
+  async (req, res) => {
+    try {
+      const spotId = req.params.id;
+      const userId = req.user?.id;
+
+      const files = req.files.map((file) => ({
+        url: `/uploads/${userId}/${file.filename}`,
+        spotId,
+      }));
+
+      const images = await SpotImage.bulkCreate(files);
+      res.status(201).json(images);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      res.status(500).json({ error: "Failed to upload images" });
+    }
+  }
+);
+
+// Get images for a spot
+router.get("/:id/images", async (req, res) => {
+  try {
+    const spotId = req.params.id;
+    const images = await SpotImage.findAll({ where: { spotId } });
+    res.status(200).json(images);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch images" });
+  }
+});
+
+// Delete an image for a spot
+router.delete("/:spotId/images/:imageId", authMiddleware, async (req, res) => {
+  try {
+    const { spotId, imageId } = req.params;
+
+    // Find the image
+    const image = await SpotImage.findByPk(imageId);
+    if (!image) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    // Ensure the image belongs to the given spot
+    if (image.spotId !== parseInt(spotId)) {
+      return res
+        .status(404)
+        .json({ error: "Image does not belong to this spot" });
+    }
+
+    // Check permissions
+    const spot = await Spot.findByPk(spotId);
+    if (!spot) {
+      return res.status(404).json({ error: "Spot not found" });
+    }
+
+    const isSpotPoster = spot.userId === req.user.id;
+    const isImageUploader = image.uploaderId === req.user.id;
+    const isAdmin = req.user.role === "admin";
+
+    if (!isSpotPoster && !isImageUploader && !isAdmin) {
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this image" });
+    }
+
+    // Delete the image file
+    const filePath = path.join(
+      __dirname,
+      "../uploads",
+      image.url.split("/uploads/")[1]
+    );
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    await image.destroy();
+
+    res.status(200).json({ message: "Image deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting image:", err);
+    res.status(500).json({ error: "Failed to delete image" });
+  }
+});
 
 router.get("/spot-count", async (req, res) => {
   try {
