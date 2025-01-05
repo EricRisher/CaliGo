@@ -386,7 +386,6 @@ export default function SpotDetail() {
       <div className="p-4 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="mb-0">Gallery</h2>
-          {isAuthorized && (
             <div className="flex flex-row">
               <button onClick={toggleImageForm} className="p-2 mr-2">
                 Add Photos
@@ -398,7 +397,6 @@ export default function SpotDetail() {
                 {isEditMode ? "Done" : "Edit"}
               </button>
             </div>
-          )}
         </div>
         {images.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
