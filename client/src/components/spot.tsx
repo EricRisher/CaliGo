@@ -244,16 +244,16 @@ export function Spots({ spotId }: { spotId?: string }) {
       {spotsData.map((spot: Spot) => (
         <div
           key={spot.id}
-          className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
+          className="spot bg-gray-200 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center relative">
-            <div className="mb-4">
-              <p className="font-bold mb-0">{spot.spotName}</p>
+            <div className="m-2 ml-4">
+              <p className="font-bold m-0">{spot.spotName}</p>
               <a
                 href={`https://www.google.com/maps?q=${spot.latitude},${spot.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit hover:underline mb-4"
+                className="text-inherit hover:underline m-0"
               >
                 {spot.city}
               </a>
@@ -263,11 +263,11 @@ export function Spots({ spotId }: { spotId?: string }) {
               alt="Menu"
               width={20}
               height={20}
-              className="cursor-pointer"
+              className="cursor-pointer mr-4"
               onClick={() => openEditForm(spot)}
             />
           </div>
-          <div className=" bg-gray-400 rounded-md mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
+          <div className=" bg-gray-400 mb-2 min-h-[200px] max-h-[500px] overflow-hidden">
             {spot.image && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -279,7 +279,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               />
             )}
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center ml-4">
             <div className="flex space-x-4 items-center">
               <button onClick={() => toggleLike(spot.id)}>
                 <Image
@@ -318,7 +318,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               </button>
             </div>
           </div>
-          <div className="description">
+          <div className="description ml-2">
             <p>
               <b>{spot.creator?.username} • </b>
               {spot.description.length > 300 ? (
@@ -338,18 +338,9 @@ export function Spots({ spotId }: { spotId?: string }) {
               ) : (
                 spot.description
               )}
-              {spot.description.length > 300 &&
-                expandedDescriptions[spot.id] && (
-                  <button
-                    onClick={() => toggleDescription(spot.id)}
-                    className="ml-2 underline clear-left"
-                  >
-                    Show Less
-                  </button>
-                )}
             </p>
           </div>
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between mx-4">
             <CommentPreview
               comments={
                 commentsData[spot.id]?.map((comment) => ({
@@ -380,7 +371,7 @@ export function Spots({ spotId }: { spotId?: string }) {
               See More
             </button>
           </div>
-          <div className="mt-1 font-normal text-right">
+          <div className="pt-1 p-4 font-normal text-right">
             {new Date(spot.updatedAt).toLocaleDateString()}
           </div>
         </div>
