@@ -210,25 +210,24 @@ export function Spots({ spotId }: { spotId?: string }) {
       {/* Comment Preview Modal */}
       {activeSpot && (
         <CommentPreview
-  comments={
-    (activeSpot?.comments || []).map((comment) => ({
-      commentText: comment.commentText,
-      username: comment.commentAuthor?.username || "Anonymous", // Add the username
-    }))
-  }
-  onFetchComments={async () => {
-    const response = await fetch(`${apiUrl}/comments/${activeSpot?.id}`);
-    const fetchedComments = await response.json();
-    return fetchedComments.map((comment: Comment) => ({
-      commentText: comment.commentText,
-      username: comment.commentAuthor?.username || "Anonymous", // Ensure username is included
-    }));
-  }}
-  spotId={activeSpot?.id || 0}
-  isActive={!!activeSpot}
-  setActivePreview={() => setActiveSpot(null)}
-/>
-
+          comments={(activeSpot?.comments || []).map((comment) => ({
+            commentText: comment.commentText,
+            username: comment.commentAuthor?.username || "Anonymous", // Add the username
+          }))}
+          onFetchComments={async () => {
+            const response = await fetch(
+              `${apiUrl}/comments/${activeSpot?.id}`
+            );
+            const fetchedComments = await response.json();
+            return fetchedComments.map((comment: Comment) => ({
+              commentText: comment.commentText,
+              username: comment.commentAuthor?.username || "Anonymous", // Ensure username is included
+            }));
+          }}
+          spotId={activeSpot?.id || 0}
+          isActive={!!activeSpot}
+          setActivePreview={() => setActiveSpot(null)}
+        />
       )}
 
       {/* Spot List */}
@@ -238,17 +237,17 @@ export function Spots({ spotId }: { spotId?: string }) {
           className="spot bg-gray-200 rounded-md shadow-md p-4 mb-4 sm:max-w-sm md:max-w-lg mx-auto"
         >
           <div className="flex justify-between items-center relative">
-            <div>
+            <div className="mb-4">
               <p className="font-bold mb-0">{spot.spotName}</p>
-              <p className="mt-0">{spot.city}</p>
+              <a
+                href={`https://www.google.com/maps?q=${spot.latitude},${spot.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit hover:underline mb-4"
+              >
+                {spot.city}
+              </a>
             </div>
-            {/* <img
-                src={profilePicture || "/icons/user.png"}
-                alt="Profile"
-                width={48}
-                height={48}
-                className="rounded-full"
-              /> */}
             <Image
               src={"/icons/menu.png"}
               alt="Menu"
