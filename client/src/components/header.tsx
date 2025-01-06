@@ -36,8 +36,8 @@ export function Header() {
         src="/icons/icon-trans.png"
         alt="CaliGo"
         className="icon-logo"
-        width={50}
-        height={50}
+        width={64}
+        height={64}
         onClick={() => (window.location.href = "/home")}
       />
       {/* <div className="search flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-md">
