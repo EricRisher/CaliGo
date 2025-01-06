@@ -297,7 +297,7 @@ export default function SpotDetail() {
       currentUser.role === "admin"; // Admin
   };
   return (
-    <div className="container spot-info mx-auto mb-[100px] mt-[82px]">
+    <div className="container spot-info mx-auto mb-[100px] mt-[80px]">
       <Header />
       <div className="wrapper flex flex-col items-center relative">
         <button

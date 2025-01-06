@@ -51,6 +51,9 @@ export function Spots({ spotId }: { spotId?: string }) {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [activePreview, setActivePreview] = useState<number | null>(null);
   const [activeSpot, setActiveSpot] = useState<Spot | null>(null); // Track active spot for the modal
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{
+    [id: number]: boolean;
+  }>({});
 
   const openEditForm = (spot: Spot) => {
     setSelectedSpot(spot);
@@ -188,6 +191,13 @@ export function Spots({ spotId }: { spotId?: string }) {
     return () => observer.disconnect();
   }, [spotsData]);
 
+  const toggleDescription = (id: number) => {
+    setExpandedDescriptions((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -308,9 +318,35 @@ export function Spots({ spotId }: { spotId?: string }) {
               </button>
             </div>
           </div>
-          <div>
-            <p className="m-0 pt-2">
-              <b>{spot.creator?.username} •</b> {spot.description}
+          <div className="description">
+            <p>
+              <b>{spot.creator?.username} • </b>
+              {spot.description.length > 300 ? (
+                expandedDescriptions[spot.id] ? (
+                  spot.description
+                ) : (
+                  <>
+                    {spot.description.slice(0, 300)}...
+                    <button
+                      onClick={() => toggleDescription(spot.id)}
+                      className="ml-2 underline clear-left"
+                    >
+                      Read More
+                    </button>
+                  </>
+                )
+              ) : (
+                spot.description
+              )}
+              {spot.description.length > 300 &&
+                expandedDescriptions[spot.id] && (
+                  <button
+                    onClick={() => toggleDescription(spot.id)}
+                    className="ml-2 underline clear-left"
+                  >
+                    Show Less
+                  </button>
+                )}
             </p>
           </div>
           <div className="flex flex-row justify-between">

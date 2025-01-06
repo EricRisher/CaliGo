@@ -10,7 +10,7 @@ export default function HomePage() {
     // <ProtectedPage>
     <div className="flex flex-col min-h-screen bg-[#f0f0f0]">
       <Header />
-      <main className="flex-grow p-4 py-[100px]">
+      <main className="flex-grow p-4 py-[96px]">
         <Spots />
       </main>
       <Navigation />
