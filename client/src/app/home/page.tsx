@@ -8,7 +8,7 @@ import ProtectedPage from "@/components/ProtectedPage";
 export default function HomePage() {
   return (
     // <ProtectedPage>
-    <div className="flex flex-col min-h-screen bg-gray-200">
+    <div className="flex flex-col min-h-screen bg-gray-200 home-page">
       <Header />
       <main className="flex-grow py-[80px]">
         <Spots />
