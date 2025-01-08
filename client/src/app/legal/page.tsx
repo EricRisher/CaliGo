@@ -12,9 +12,9 @@ function Page() {
       <h1 className="m-4 text-center">LEGAL</h1>
       <h3>Last Updated: 1/8/2025</h3>
       <p>
-        This Privacy Policy for <strong>CaliGo</strong> ("we," "us," or "our")
+        This Privacy Policy for <strong>CaliGo</strong> (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;)
         describes how we collect, use, and protect your personal information
-        when you use our services ("Services"), including but not limited to:
+        when you use our services (&quot;Services&quot;), including but not limited to:
       </p>
       <p>
         If you have questions or concerns about this policy, please contact us
@@ -329,7 +329,7 @@ function Page() {
       </h2>
       <p>
         Yes, we may update this policy to remain compliant with laws. Updates
-        will be noted by the "Last Updated" date. Significant changes may be
+        will be noted by the &quot;Last Updated&quot; date. Significant changes may be
         communicated via email or on our website.
       </p>
 
