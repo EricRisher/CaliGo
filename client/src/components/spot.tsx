@@ -182,7 +182,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           }
         });
       },
-      { rootMargin: "100px", threshold: 0.3 } // Adjust rootMargin for pre-loading
+      { rootMargin: "100px", threshold: 0.1 } // Adjust rootMargin for pre-loading
     );
 
     const spots = document.querySelectorAll(".spot");

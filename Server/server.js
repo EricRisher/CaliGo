@@ -64,8 +64,13 @@ app.use(cookieParser());
 
 // Static asset serving
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), {
+    maxAge: "1y", 
+    etag: true,
+  })
+);
 // Health check route
 app.get("/", (req, res) => {
   res.send("Backend server is running!");
