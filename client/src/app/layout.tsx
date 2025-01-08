@@ -48,6 +48,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         ></script>
 
+        
+
         <meta name="msapplication-TileColor" content="#2b5797" />
         <link
           rel="apple-touch-icon"

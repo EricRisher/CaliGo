@@ -107,6 +107,13 @@ export default function SignupPage() {
           onSubmit={handleSignup}
           className="flex flex-col gap-4 w-80 mt-8 p-4 bg-white rounded-lg shadow-lg"
         >
+          <h1 className="text-2xl font-bold mb-0">Sign Up</h1>
+          <p className="text-sm m-0">
+            Been Here Before?
+            <a href="/login" className="text-blue-600">
+              Log in
+            </a>
+          </p>
           {error && <p className="text-red-500">{error}</p>}
           <input
             type="email"
@@ -188,6 +195,7 @@ export default function SignupPage() {
           >
             Sign Up
           </button>
+
           {/* Guest login button */}
           <button
             type="button"
@@ -196,12 +204,18 @@ export default function SignupPage() {
           >
             Continue as Guest
           </button>
-          <p className="text-sm mt-2">
-            Been Here Before?{" "}
-            <a href="/login" className="text-blue-600">
-              Log in
+
+          <span className="text-xs text-left">
+            By clicking Sign Up, you agree to our
+            <a href="/legal" className="text-blue-500 text-xs underline">
+              Terms of Service
             </a>
-          </p>
+            and
+            <a href="/legal" className="text-blue-500 text-xs underline">
+              Privacy Policy.
+            </a>
+            
+          </span>
         </form>
       </main>
     </div>

@@ -76,6 +76,13 @@ export default function LoginPage() {
           onSubmit={handleLogin}
           className="flex flex-col gap-4 w-80 mt-8 p-4 bg-white rounded-lg shadow-lg"
         >
+          <h1 className="text-2xl font-bold mb-0">Log in</h1>
+          <p className="text-sm m-0">
+            New Here?{" "}
+            <a href="/signup" className="text-blue-600">
+              Sign up
+            </a>
+          </p>
           {error && <p className="text-red-500">{error}</p>}
 
           {/* Username input */}
@@ -131,13 +138,6 @@ export default function LoginPage() {
           >
             Continue as Guest
           </button>
-
-          <p className="text-sm mt-2">
-            New Here?{" "}
-            <a href="/signup" className="text-blue-600">
-              Sign up
-            </a>
-          </p>
         </form>
       </main>
     </div>
