@@ -174,7 +174,7 @@ export function Spots({ spotId }: { spotId?: string }) {
           if (entry.isIntersecting) {
             const img = entry.target.querySelector("img[data-src]");
             if (img) {
-              img.src = img.dataset.src!; // Assign the actual image URL
+              (img as HTMLImageElement).src = (img as HTMLImageElement).dataset.src!; // Assign the actual image URL
               img.removeAttribute("data-src"); // Remove the `data-src` attribute
             }
             entry.target.classList.add("show"); // Optional: Add visible class
