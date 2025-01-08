@@ -169,26 +169,26 @@ export function Spots({ spotId }: { spotId?: string }) {
     if (spotsData.length === 0) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries, obs) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const img = entry.target.querySelector("img");
-            if (img && img.dataset.src) {
-              img.src = img.dataset.src; // Set the actual image source
-              img.removeAttribute("data-src"); // Clean up the data attribute
+            const img = entry.target.querySelector("img[data-src]");
+            if (img) {
+              img.src = img.dataset.src!; // Assign the actual image URL
+              img.removeAttribute("data-src"); // Remove the `data-src` attribute
             }
-            entry.target.classList.add("show"); // Optional class for animations
-            observer.unobserve(entry.target); // Stop observing the already-loaded image
+            entry.target.classList.add("show"); // Optional: Add visible class
+            obs.unobserve(entry.target); // Stop observing once loaded
           }
         });
       },
-      { rootMargin: "0px", threshold: 0.1 }
+      { rootMargin: "100px", threshold: 0.3 } // Adjust rootMargin for pre-loading
     );
 
-    const cards = document.querySelectorAll(".spot");
-    cards.forEach((card) => observer.observe(card));
+    const spots = document.querySelectorAll(".spot");
+    spots.forEach((spot) => observer.observe(spot));
 
-    return () => observer.disconnect();
+    return () => observer.disconnect(); // Cleanup
   }, [spotsData]);
 
   const toggleDescription = (id: number) => {
@@ -271,11 +271,11 @@ export function Spots({ spotId }: { spotId?: string }) {
             {spot.image && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={spot.image}
+                data-src={spot.image} // Set the actual URL here
                 alt={spot.spotName}
                 width={500}
                 height={500}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover lazy-image" // Add a custom class for styling
               />
             )}
           </div>

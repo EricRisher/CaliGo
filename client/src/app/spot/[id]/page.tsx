@@ -284,18 +284,6 @@ export default function SpotDetail() {
     setShowImageForm(false); // Optionally close the form after upload
   };
 
-  const currentUser = {
-    id: 1, // Replace with the logged-in user's ID
-    role: "user", // Replace with the user's role (e.g., "admin")
-  };
-
-  // Check if the current user is authorized to edit the spot
-
-  const isAuthorized = () => {
-    spot?.creator.id === currentUser.id || // Spot poster
-      images.some((img) => img.uploaderId === currentUser.id) || // Image uploader
-      currentUser.role === "admin"; // Admin
-  };
   return (
     <div className="container spot-info mx-auto mb-[100px] mt-[80px]">
       <Header />
