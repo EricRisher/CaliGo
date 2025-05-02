@@ -19,6 +19,7 @@ export default function Home() {
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [isIos, setIsIos] = useState(false);
   const [spotCount, setSpotCount] = useState(0);
+  const [userCount, setUserCount] = useState(0);
 
   // Handle "beforeinstallprompt" event
   useEffect(() => {
@@ -68,6 +69,23 @@ export default function Home() {
     fetchSpotCount();
   }, []);
 
+  useEffect(() => {
+    // Fetch user count from the backend
+    const fetchUserCount = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await fetch(`${apiUrl}/users/user-count`); // Adjust the URL to match your API endpoint
+
+        const data = await response.json();
+        setUserCount(data.total); // Update state with the count
+      } catch (error) {
+        console.error("Error fetching user count:", error);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
+
   const installPWA = async () => {
     if (deferredPrompt) {
       const promptEvent = deferredPrompt as any;
@@ -111,7 +129,10 @@ export default function Home() {
             </Button>
             {/* Custom Install Button */}
             {showInstallButton && (
-              <Button onClick={installPWA} className="bg-orange-400 text-white mt-2">
+              <Button
+                onClick={installPWA}
+                className="bg-orange-400 text-white mt-2"
+              >
                 Install App
               </Button>
             )}
@@ -133,6 +154,11 @@ export default function Home() {
               Over{" "}
               <span className="text-4xl font-bold text-black">{spotCount}</span>{" "}
               incredible spots shared by our community!
+            </h3>
+            <h3 className="text-1xl tracking-wider">
+              Join{" "}
+              <span className="text-4xl font-bold text-black">{userCount}</span>{" "}
+              other adventurers and start your journey today!
             </h3>
           </div>
           <section className="flex flex-row flex-wrap justify-evenly">

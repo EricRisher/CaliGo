@@ -15,6 +15,32 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/user-count", async (req, res) => {
+  try {
+    const count = await User.count();
+    res.json({ total: count });
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    res.status(500).json({ error: "Failed to fetch user count" });
+  }
+});
+
+// Get the authenticated user's profile (Protected Route)
+router.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.auth.userId; // Get the authenticated user's ID from the token
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update a user (Protected Route - Only the authenticated user can update their own account)
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
