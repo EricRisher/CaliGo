@@ -155,11 +155,6 @@ export default function Home() {
               <span className="text-4xl font-bold text-black">{spotCount}</span>{" "}
               incredible spots shared by our community!
             </h3>
-            <h3 className="text-1xl tracking-wider">
-              Join{" "}
-              <span className="text-4xl font-bold text-black">{userCount}</span>{" "}
-              other adventurers and start your journey today!
-            </h3>
           </div>
           <section className="flex flex-row flex-wrap justify-evenly">
             <Image
@@ -194,6 +189,13 @@ export default function Home() {
         </section>
         <footer className="relative flex justify-evenly items-center w-full bg-transparent mt-auto p-4 flex-col">
           <h5>CaliGo - Your Adventure Starts Here</h5>
+          <h5 className="text-xl tracking-wider text-black-200">
+            Join{" "}
+            <span className="font-bold ">
+              {userCount}
+            </span>{" "}
+            other adventurers and start your journey today!
+          </h5>
           <div>
             <a href="/legal" className="hover:underline">
               Legal
@@ -202,7 +204,7 @@ export default function Home() {
               href="https://github.com/EricRisher/CaliGo"
               className="hover:underline"
             >
-              Version 2.5
+              Version 3.1.3
             </a>
             <a href="https://www.ericrisher.com" className="hover:underline">
               by <b>Eric Risher</b>
